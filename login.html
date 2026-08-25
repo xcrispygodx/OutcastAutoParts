@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - Outcast Auto Parts</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-body">
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="images/logo.png" alt="Outcast Auto Parts Logo" class="logo-img">
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Marketplace</a></li>
+                <li><a href="login.html" class="active">Dashboard</a></li>
+                <li><a href="#new-arrivals">New Arrivals</a></li>
+                <li><a href="#ebay-search">eBay Search</a></li>
+                <li><a href="#my-listings">My Listings</a></li>
+            </ul>
+            <div class="nav-actions">
+                <span class="user-info">Welcome, <strong>Seller</strong></span>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <section class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-header-content">
+                <div>
+                    <img src="images/logo.png" alt="Outcast Auto Parts" class="dashboard-logo">
+                    <h1>Seller Dashboard</h1>
+                    <p>Manage your parts, track arrivals, and maximize profits</p>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-primary" onclick="showAddListingModal()">+ Add New Listing</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Cards -->
+    <section class="dashboard-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Active Listings</h3>
+                        <p class="stat-number" id="activeListings">24</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <p class="stat-number" id="totalRevenue">$3,450</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3>Views This Month</h3>
+                        <p class="stat-number" id="monthlyViews">1,234</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚚</div>
+                    <div class="stat-info">
+                        <h3>Pending Shipments</h3>
+                        <p class="stat-number" id="pendingShipments">3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- New Arrivals from Local Yards -->
+    <section class="dashboard-section" id="new-arrivals">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>New Arrivals from Local Yards</h2>
+                    <p>Fresh inventory from partnered junkyards in your area</p>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-secondary" onclick="refreshArrivals()">🔄 Refresh</button>
+                    <select id="yardFilter" class="filter-select" onchange="filterYards()">
+                        <option value="all">All Yards</option>
+                        <option value="yard1">Auto Salvage Co.</option>
+                        <option value="yard2">Metro Dismantling</option>
+                        <option value="yard3">Quality Auto Parts</option>
+                        <option value="yard4">Highway Auto Wreckers</option>
+                    </select>
+                </div>
+            </div>
+            <div class="arrivals-grid" id="arrivalsGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- eBay Parts Search & Pricing -->
+    <section class="dashboard-section" id="ebay-search">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>eBay Parts Pricing Intelligence</h2>
+                    <p>Search eBay sold listings to determine profitable parts to pull</p>
+                </div>
+            </div>
+            <div class="ebay-search-box">
+                <div class="search-form-row">
+                    <input type="text" id="ebayPartSearch" placeholder="Search parts (e.g., 'window motor', 'ECU', 'brake module')" class="search-input">
+                    <select id="ebayMakeFilter" class="filter-select">
+                        <option value="">All Makes</option>
+                        <option value="ford">Ford</option>
+                        <option value="chevrolet">Chevrolet</option>
+                        <option value="toyota">Toyota</option>
+                        <option value="honda">Honda</option>
+                        <option value="nissan">Nissan</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="searchEbayParts()">🔍 Search eBay</button>
+                </div>
+            </div>
+            <div class="ebay-results" id="ebayResults">
+                <div class="ebay-summary" id="ebaySummary">
+                    <p>Search for parts to see pricing data from eBay sold listings</p>
+                </div>
+                <div class="ebay-grid" id="ebayGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- My Listings -->
+    <section class="dashboard-section" id="my-listings">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>My Listings</h2>
+                    <p>Manage your active and sold listings</p>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-primary" onclick="showAddListingModal()">+ Add Listing</button>
+                </div>
+            </div>
+            <div class="listings-table-container">
+                <table class="listings-table">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Vehicle</th>
+                            <th>eBay Price</th>
+                            <th>Your Price</th>
+                            <th>Profit</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listingsTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Freight Shipping Placeholder -->
+    <section class="dashboard-section" id="freight-shipping">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>Freight Shipping <span class="badge badge-coming-soon">Coming Soon</span></h2>
+                    <p>Heavy item shipping for engines, transmissions, and large components</p>
+                </div>
+            </div>
+            <div class="freight-placeholder">
+                <div class="freight-icon">🚚</div>
+                <h3>Freight Shipping Module</h3>
+                <p>We're working on integrated freight shipping for oversized items like engines, transmissions, axles, and complete assemblies.</p>
+                <ul class="freight-features">
+                    <li>✅ Automatic freight quote comparison</li>
+                    <li>✅ LTL and full truckload options</li>
+                    <li>✅ Integrated shipping labels</li>
+                    <li>✅ Tracking and insurance</li>
+                    <li>✅ Pallet and crating guidance</li>
+                </ul>
+                <button class="btn btn-secondary" disabled>Notify Me When Available</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Listing Modal -->
+    <div class="modal" id="addListingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Listing</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addListingForm" onsubmit="addListing(event)">
+                    <div class="form-group">
+                        <label>Part Name</label>
+                        <input type="text" id="listingPartName" required placeholder="e.g., Window Motor">
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle</label>
+                        <input type="text" id="listingVehicle" required placeholder="e.g., 2015 Ford F-150">
+                    </div>
+                    <div class="form-group">
+                        <label>eBay Sold Price</label>
+                        <input type="number" id="listingEbayPrice" required placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Your Price</label>
+                        <input type="number" id="listingYourPrice" required placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Shipping Weight (lbs)</label>
+                        <input type="number" id="listingWeight" placeholder="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Condition</label>
+                        <select id="listingCondition">
+                            <option value="used">Used</option>
+                            <option value="refurbished">Refurbished</option>
+                            <option value="new">New</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Listing</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
