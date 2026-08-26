@@ -108,7 +108,7 @@ const sampleArrivals = [
         yardId: 'wrench',
         yardName: 'Wrench-A-Part',
         yardUrl: 'https://wrenchapart.com',
-        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Wrench-A-Part',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Wrench-A-Part',
         vehicle: '2019 Ford F-150 XLT',
         vin: '1FTEW1EP5KFA12345',
         date: '2025-08-25',
@@ -125,7 +125,7 @@ const sampleArrivals = [
         yardId: 'roosevelt',
         yardName: 'Roosevelt U-Pull-It',
         yardUrl: 'https://rooseveltupullit.com',
-        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
         vehicle: '2020 Chevrolet Silverado 1500',
         vin: '3GCPWCEF5LG123456',
         date: '2025-08-24',
@@ -142,7 +142,7 @@ const sampleArrivals = [
         yardId: 'auto-salvage',
         yardName: 'Auto Salvage Co.',
         yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
-        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=AutoAlchemy+Yard',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=AutoAlchemy+Yard',
         vehicle: '2018 Toyota Camry SE',
         vin: '4T1B11HK5JU123789',
         date: '2025-08-23',
@@ -159,7 +159,7 @@ const sampleArrivals = [
         yardId: 'metro',
         yardName: 'Metro Dismantling',
         yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
-        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Metro+Dismantling',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Metro+Dismantling',
         vehicle: '2021 Honda CR-V EX',
         vin: '2HKRW2H54MH123012',
         date: '2025-08-22',
@@ -299,7 +299,7 @@ function loadNewArrivals(yardFilter = 'all') {
             <span class="arrival-badge">NEW</span>
             <div class="arrival-yard-header">
                 <a href="${arrival.yardUrl}" target="_blank" class="arrival-yard-link">
-                    <img src="${arrival.yardImage}" alt="${arrival.yardName}" class="arrival-yard-img" onerror="this.src='https://via.placeholder.com/400x200/1a0b2e/ffd700?text=${encodeURIComponent(arrival.yardName)}'">
+                    <img src="${arrival.yardImage}" alt="${arrival.yardName}" class="arrival-yard-img" onerror="this.src='https://placehold.co/400x200/1a0b2e/ffd700?text=${encodeURIComponent(arrival.yardName)}'">
                 </a>
                 <div class="arrival-yard-info">
                     <div class="arrival-yard">${arrival.yardName}</div>
