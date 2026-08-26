@@ -170,6 +170,142 @@ const sampleArrivals = [
             { name: 'Sun Visor (Passenger)', partNumber: '83280-TR3-A01', easyShip: true, ebayPrice: 28.00, compatibleModels: ['2017-2021 CR-V'] },
             { name: 'ABS Control Module', partNumber: '57810-TR3-A01', easyShip: true, ebayPrice: 165.00, compatibleModels: ['2017-2021 CR-V', '2018-2021 Civic'] }
         ]
+    },
+    {
+        id: 5,
+        yardId: 'wrench',
+        yardName: 'Wrench-A-Part',
+        yardUrl: 'https://wrenchapart.com',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Wrench-A-Part',
+        vehicle: '2022 Ford Mustang GT',
+        vin: '1FA6P8CF6N5123456',
+        date: '2025-08-21',
+        yardFee: '$14.00',
+        parts: [
+            { name: 'Navigation Screen', partNumber: 'ML3T-19C088-AA', easyShip: true, ebayPrice: 210.00, compatibleModels: ['2018-2023 Mustang', '2020-2023 Explorer'] },
+            { name: 'Heated Seat Switch', partNumber: 'ML3T-14A695-AA', easyShip: true, ebayPrice: 75.00, compatibleModels: ['2018-2023 Mustang', '2020-2023 Edge'] },
+            { name: 'Blower Motor Resistor', partNumber: 'ML3T-19E626-AA', easyShip: true, ebayPrice: 38.00, compatibleModels: ['2018-2023 Mustang'] },
+            { name: 'Steering Wheel Control Module', partNumber: 'ML3T-14D069-AA', easyShip: true, ebayPrice: 95.00, compatibleModels: ['2018-2023 Mustang', '2020-2023 Fusion'] }
+        ]
+    },
+    {
+        id: 6,
+        yardId: 'roosevelt',
+        yardName: 'Roosevelt U-Pull-It',
+        yardUrl: 'https://rooseveltupullit.com',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        vehicle: '2017 Nissan Altima 2.5 SL',
+        vin: '1N4AL3AP4HN123456',
+        date: '2025-08-20',
+        yardFee: '$11.00',
+        parts: [
+            { name: 'Smart Key Module', partNumber: '5WY1-3S0-CA1', easyShip: true, ebayPrice: 135.00, compatibleModels: ['2016-2023 Altima', '2019-2023 Sentra'] },
+            { name: 'Airbag Sensor Module', partNumber: '98820-3AA0A', easyShip: false, ebayPrice: 85.00, compatibleModels: ['2016-2023 Altima', '2017-2023 Rogue'] },
+            { name: 'Fuel Pump Module', partNumber: '17040-3TA0A', easyShip: true, ebayPrice: 110.00, compatibleModels: ['2016-2023 Altima', '2019-2023 Maxima'] },
+            { name: 'BCM Body Control Module', partNumber: '284B1-3AA0A', easyShip: true, ebayPrice: 95.00, compatibleModels: ['2016-2023 Altima', '2017-2023 Pathfinder'] }
+        ]
+    },
+    {
+        id: 7,
+        yardId: 'auto-salvage',
+        yardName: 'Auto Salvage Co.',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=AutoAlchemy+Yard',
+        vehicle: '2023 Toyota Tacoma TRD Sport',
+        vin: '3TMAZ5CN9PM123456',
+        date: '2025-08-19',
+        yardFee: '$16.00',
+        parts: [
+            { name: 'Multi-Function Switch', partNumber: '84182-0C070', easyShip: true, ebayPrice: 88.00, compatibleModels: ['2016-2023 Tacoma', '2016-2023 Tundra'] },
+            { name: 'Power Seat Switch', partNumber: '85730-0C030', easyShip: true, ebayPrice: 42.00, compatibleModels: ['2016-2023 Tacoma', '2020-2023 Highlander'] },
+            { name: 'Radio Receiver', partNumber: '86180-0C420', easyShip: true, ebayPrice: 175.00, compatibleModels: ['2016-2023 Tacoma', '2019-2023 RAV4'] },
+            { name: 'Transfer Case Motor', partNumber: '36110-0C030', easyShip: false, ebayPrice: 220.00, compatibleModels: ['2016-2023 Tacoma 4WD'] }
+        ]
+    },
+    {
+        id: 8,
+        yardId: 'metro',
+        yardName: 'Metro Dismantling',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Metro+Dismantling',
+        vehicle: '2019 Dodge Ram 1500 Big Horn',
+        vin: '1C6SRFFT4KN123456',
+        date: '2025-08-18',
+        yardFee: '$13.00',
+        parts: [
+            { name: 'Instrument Cluster', partNumber: '68424985AC', easyShip: true, ebayPrice: 145.00, compatibleModels: ['2019-2023 Ram 1500', '2021-2023 Ram 2500'] },
+            { name: 'HVAC Control Module', partNumber: '68220858AA', easyShip: true, ebayPrice: 98.00, compatibleModels: ['2019-2023 Ram 1500', '2020-2023 Jeep Gladiator'] },
+            { name: 'Tailgate Handle', partNumber: '68065485AA', easyShip: true, ebayPrice: 65.00, compatibleModels: ['2019-2023 Ram 1500'] },
+            { name: 'Seat Memory Module', partNumber: '68403278AA', easyShip: true, ebayPrice: 72.00, compatibleModels: ['2019-2023 Ram 1500', '2020-2023 Grand Cherokee'] }
+        ]
+    },
+    {
+        id: 9,
+        yardId: 'wrench',
+        yardName: 'Wrench-A-Part',
+        yardUrl: 'https://wrenchapart.com',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Wrench-A-Part',
+        vehicle: '2016 GMC Sierra 2500HD Denali',
+        vin: '3GTU2YECXGG123456',
+        date: '2025-08-17',
+        yardFee: '$18.00',
+        parts: [
+            { name: 'Head-Up Display Module', partNumber: '23456789', easyShip: true, ebayPrice: 190.00, compatibleModels: ['2015-2023 Sierra 2500HD', '2015-2023 Silverado 2500HD'] },
+            { name: 'Steering Wheel Heater Module', partNumber: '23456790', easyShip: true, ebayPrice: 85.00, compatibleModels: ['2015-2023 Sierra 2500HD', '2016-2023 Yukon'] },
+            { name: 'Park Assist Camera', partNumber: '23456791', easyShip: true, ebayPrice: 115.00, compatibleModels: ['2015-2023 Sierra 2500HD', '2015-2023 Tahoe'] },
+            { name: 'Trailer Brake Controller', partNumber: '23456792', easyShip: true, ebayPrice: 135.00, compatibleModels: ['2015-2023 Sierra 2500HD', '2015-2023 Silverado 2500HD'] }
+        ]
+    },
+    {
+        id: 10,
+        yardId: 'roosevelt',
+        yardName: 'Roosevelt U-Pull-It',
+        yardUrl: 'https://rooseveltupullit.com',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        vehicle: '2021 BMW 330i xDrive',
+        vin: 'WBA53BP09MCN12345',
+        date: '2025-08-16',
+        yardFee: '$20.00',
+        parts: [
+            { name: 'Headlight Level Motor', partNumber: '63117377718', easyShip: true, ebayPrice: 78.00, compatibleModels: ['2019-2023 3 Series', '2020-2023 4 Series'] },
+            { name: 'iDrive Controller', partNumber: '65829374821', easyShip: true, ebayPrice: 145.00, compatibleModels: ['2019-2023 3 Series', '2019-2023 5 Series'] },
+            { name: 'Park Distance Control', partNumber: '66429374821', easyShip: true, ebayPrice: 55.00, compatibleModels: ['2019-2023 3 Series', '2020-2023 X3'] },
+            { name: 'Seat Adjustment Motor', partNumber: '74123747412', easyShip: true, ebayPrice: 92.00, compatibleModels: ['2019-2023 3 Series', '2020-2023 4 Series'] }
+        ]
+    },
+    {
+        id: 11,
+        yardId: 'auto-salvage',
+        yardName: 'Auto Salvage Co.',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=AutoAlchemy+Yard',
+        vehicle: '2022 Mazda CX-5 Grand Touring',
+        vin: 'JM3KFBCM3N1234567',
+        date: '2025-08-15',
+        yardFee: '$12.00',
+        parts: [
+            { name: 'Mazda Connect Module', partNumber: 'KDY3-66-9X0', easyShip: true, ebayPrice: 165.00, compatibleModels: ['2017-2023 CX-5', '2019-2023 CX-9'] },
+            { name: 'Power Window Motor', partNumber: 'KDY3-69-9X0', easyShip: true, ebayPrice: 48.00, compatibleModels: ['2017-2023 CX-5', '2018-2023 Mazda3'] },
+            { name: 'Blind Spot Module', partNumber: 'KDY3-67-9X0', easyShip: true, ebayPrice: 72.00, compatibleModels: ['2017-2023 CX-5', '2020-2023 CX-30'] },
+            { name: 'Steering Switch Module', partNumber: 'KDY3-66-9X0B', easyShip: true, ebayPrice: 38.00, compatibleModels: ['2017-2023 CX-5', '2019-2023 CX-9'] }
+        ]
+    },
+    {
+        id: 12,
+        yardId: 'metro',
+        yardName: 'Metro Dismantling',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Metro+Dismantling',
+        vehicle: '2015 Jeep Wrangler Unlimited Rubicon',
+        vin: '1C4BJWFG5FL123456',
+        date: '2025-08-14',
+        yardFee: '$14.00',
+        parts: [
+            { name: 'Electronic Stability Control Module', partNumber: '68349723AB', easyShip: true, ebayPrice: 125.00, compatibleModels: ['2018-2023 Wrangler', '2020-2023 Gladiator'] },
+            { name: 'U Connect Module', partNumber: '82215024AC', easyShip: true, ebayPrice: 195.00, compatibleModels: ['2018-2023 Wrangler', '2019-2023 Ram 1500'] },
+            { name: 'Front Console Switch', partNumber: '68399726AA', easyShip: true, ebayPrice: 35.00, compatibleModels: ['2018-2023 Wrangler', '2020-2023 Gladiator'] },
+            { name: 'Heated Seat Module', partNumber: '82216024AC', easyShip: true, ebayPrice: 68.00, compatibleModels: ['2018-2023 Wrangler', '2019-2023 Grand Cherokee'] }
+        ]
     }
 ];
 
