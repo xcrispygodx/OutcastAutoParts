@@ -329,7 +329,8 @@ function loadNewArrivals(yardFilter = 'all') {
                 <button class="btn btn-secondary" onclick="createListingFromArrival(${arrival.id})">Create Listing</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function refreshArrivals() {
