@@ -4,8 +4,10 @@
 // Authentication
 // ============================================
 
-const VALID_USERNAME = 'OutcastAutoParts210';
-const VALID_PASSWORD = 'Aga6650284015Aga$';
+const VALID_CREDENTIALS = [
+    { username: 'OutcastAutoParts210', password: 'Aga6650284015Aga$' },
+    { username: 'JesusAngel', password: '6969P3nis' }
+];
 
 function handleLogin(event) {
     event.preventDefault();
@@ -13,8 +15,13 @@ function handleLogin(event) {
     const password = document.getElementById('loginPassword').value;
     const errorEl = document.getElementById('loginError');
     
-    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+    const isValid = VALID_CREDENTIALS.some(cred => 
+        cred.username === username && cred.password === password
+    );
+    
+    if (isValid) {
         sessionStorage.setItem('outcast_auth', 'true');
+        sessionStorage.setItem('outcast_user', username);
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboardContent').style.display = 'block';
         errorEl.style.display = 'none';
@@ -35,6 +42,10 @@ function logout() {
 
 function checkAuth() {
     if (sessionStorage.getItem('outcast_auth') === 'true') {
+        const username = sessionStorage.getItem('outcast_user') || 'Seller';
+        const displayEl = document.getElementById('displayUsername');
+        if (displayEl) displayEl.textContent = username;
+        
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboardContent').style.display = 'block';
         initDashboard();
