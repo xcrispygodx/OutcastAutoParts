@@ -1000,12 +1000,21 @@ body {
 .arrival-actions {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .arrival-actions .btn {
-    flex: 1;
+    flex: 1 1 100%;
     padding: 0.5rem;
     font-size: 0.8rem;
+    text-align: center;
+    justify-content: center;
+}
+
+@media (min-width: 640px) {
+    .arrival-actions .btn {
+        flex: 1 1 auto;
+    }
 }
 
 /* Listings Table */

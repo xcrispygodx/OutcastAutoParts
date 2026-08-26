@@ -272,6 +272,7 @@ function loadNewArrivals(yardFilter = 'all') {
             </ul>
             <div class="arrival-actions">
                 <button class="btn btn-primary" onclick="viewArrivalDetails(${arrival.id})">View Details</button>
+                <a href="https://xcrispygodx.github.io/BIGDONGPARTS/" target="_blank" class="btn btn-secondary">🏭 View on Yard</a>
                 <button class="btn btn-secondary" onclick="createListingFromArrival(${arrival.id})">Create Listing</button>
             </div>
         </div>
