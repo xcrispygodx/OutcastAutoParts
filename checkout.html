@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Outcast Auto Parts</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="images/logo.png" alt="Outcast Auto Parts Logo" class="logo-img">
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Marketplace</a></li>
+                <li><a href="login.html">Seller Dashboard</a></li>
+                <li><a href="checkout.html" class="active">Checkout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Checkout Section -->
+    <section class="dashboard-section" style="padding-top: 2rem;">
+        <div class="container">
+            <div class="checkout-header">
+                <h1>Direct Order Checkout</h1>
+                <p class="checkout-subtitle">Order direct and save up to 80% off dealer prices</p>
+            </div>
+
+            <div class="checkout-grid">
+                <!-- Cart Summary -->
+                <div class="checkout-main">
+                    <div class="checkout-card">
+                        <h2>Your Cart</h2>
+                        <div id="cartItems">
+                            <p class="empty-cart">Your cart is empty. <a href="index.html">Browse parts</a></p>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Info -->
+                    <div class="checkout-card">
+                        <h2>Shipping Information</h2>
+                        <form id="shippingForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shippingName">Full Name</label>
+                                    <input type="text" id="shippingName" required placeholder="John Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shippingEmail">Email</label>
+                                    <input type="email" id="shippingEmail" required placeholder="john@example.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="shippingAddress">Address</label>
+                                <input type="text" id="shippingAddress" required placeholder="123 Main St">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shippingCity">City</label>
+                                    <input type="text" id="shippingCity" required placeholder="Hometown">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shippingState">State</label>
+                                    <input type="text" id="shippingState" required placeholder="TX">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shippingZip">ZIP</label>
+                                    <input type="text" id="shippingZip" required placeholder="75001">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="shippingPhone">Phone</label>
+                                <input type="tel" id="shippingPhone" placeholder="(555) 123-4567">
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Payment -->
+                    <div class="checkout-card">
+                        <h2>Payment</h2>
+                        <div id="card-element">
+                            <!-- Stripe Elements will mount here -->
+                        </div>
+                        <div id="payment-errors" role="alert"></div>
+                        <button id="submit-payment" class="btn btn-primary checkout-btn" disabled>
+                            <span id="button-text">Place Order</span>
+                            <span id="button-spinner" class="spinner" style="display: none;"></span>
+                        </button>
+                        <p class="secure-note">🔒 Secure payment powered by Stripe</p>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="checkout-sidebar">
+                    <div class="checkout-card summary-card">
+                        <h2>Order Summary</h2>
+                        <div id="orderSummary">
+                            <p class="empty-cart">No items in cart</p>
+                        </div>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="summarySubtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="summaryShipping">$0.00</span>
+                        </div>
+                        <div class="summary-row savings">
+                            <span>Direct Order Savings</span>
+                            <span id="summarySavings">-$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="summaryTotal">$0.00</span>
+                        </div>
+                        <div class="savings-badge">
+                            You save <span id="savingsPercent">0</span>% vs retail
+                        </div>
+                    </div>
+
+                    <div class="checkout-card trust-card">
+                        <h3>Why Order Direct?</h3>
+                        <ul>
+                            <li>✅ Save up to 80% off dealer prices</li>
+                            <li>✅ Quality tested parts</li>
+                            <li>✅ Fast same-day shipping</li>
+                            <li>✅ 30-day return policy</li>
+                            <li>✅ Secure checkout</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/cart.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

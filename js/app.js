@@ -10,6 +10,7 @@ const sampleParts = [
         model: "F-150",
         year: "2015-2020",
         price: 89.99,
+        retailPrice: 349.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
         weight: 3.2
@@ -22,6 +23,7 @@ const sampleParts = [
         model: "Silverado",
         year: "2016-2021",
         price: 245.00,
+        retailPrice: 899.99,
         condition: "Refurbished",
         shipping: "Ships within 24hrs",
         weight: 5.8
@@ -34,6 +36,7 @@ const sampleParts = [
         model: "Camry",
         year: "2018-2022",
         price: 320.00,
+        retailPrice: 1299.99,
         condition: "Used",
         shipping: "Freight Only",
         weight: 2.1
@@ -46,6 +49,7 @@ const sampleParts = [
         model: "Civic",
         year: "2019-2023",
         price: 65.00,
+        retailPrice: 279.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
         weight: 1.5
@@ -58,6 +62,7 @@ const sampleParts = [
         model: "Altima",
         year: "2016-2020",
         price: 45.00,
+        retailPrice: 189.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
         weight: 0.8
@@ -70,24 +75,50 @@ const sampleParts = [
         model: "Grand Cherokee",
         year: "2017-2022",
         price: 185.00,
+        retailPrice: 749.99,
         condition: "Refurbished",
         shipping: "Ships within 24hrs",
         weight: 4.2
     }
 ];
 
+// Cart functions exposed globally
+function addToCart(partId) {
+    const part = sampleParts.find(p => p.id === partId);
+    if (!part) return;
+    
+    const item = {
+        id: part.id.toString(),
+        name: part.name,
+        vehicle: `${part.year} ${part.make} ${part.model}`,
+        price: part.price,
+        retailPrice: part.retailPrice,
+        quantity: 1
+    };
+    
+    Cart.add(item);
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     loadFeaturedParts();
     initSearchTabs();
+    Cart.updateBadge();
 });
+
+// Update cart badge when storage changes
+window.addEventListener('storage', () => Cart.updateBadge());
 
 // Load featured parts
 function loadFeaturedParts() {
     const grid = document.getElementById('featuredParts');
     if (!grid) return;
     
-    grid.innerHTML = sampleParts.map(part => `
+    grid.innerHTML = sampleParts.map(part => {
+        const savings = part.retailPrice - part.price;
+        const savingsPercent = Math.round((savings / part.retailPrice) * 100);
+        
+        return `
         <div class="part-card">
             <div class="part-card-header">
                 <div>
@@ -97,12 +128,18 @@ function loadFeaturedParts() {
                 <span class="part-card-condition">${part.condition}</span>
             </div>
             <div class="part-card-price">$${part.price.toFixed(2)}</div>
+            <div class="part-card-retail">Retail: $${part.retailPrice.toFixed(2)}</div>
+            <div class="part-card-savings">Save ${savingsPercent}%</div>
             <div class="part-card-meta">
                 <span class="part-card-shipping">${part.shipping === 'Freight Only' ? '🚚' : '📦'} ${part.shipping}</span>
                 <span>${part.weight} lbs</span>
             </div>
+            <button class="btn btn-primary order-direct-btn" onclick="addToCart(${part.id})">
+                Order Direct - $${part.price.toFixed(2)}
+            </button>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Search functionality

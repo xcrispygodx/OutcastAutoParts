@@ -1,6 +1,6 @@
 # Outcast Auto Parts - Used Car Parts Marketplace
 
-A full-featured used car parts marketplace with seller dashboard, eBay integration, and local junkyard inventory tracking.
+A full-featured used car parts marketplace with seller dashboard, eBay integration, local junkyard inventory tracking, and Stripe checkout.
 
 ## Features
 
@@ -8,7 +8,15 @@ A full-featured used car parts marketplace with seller dashboard, eBay integrati
 - **Vehicle Search** - Search parts by make, model, and year
 - **Part Categories** - Browse by engine, transmission, electrical, body, interior, etc.
 - **Featured Listings** - Highlighted quality parts ready to ship
+- **Order Direct** - Stripe checkout with savings vs retail pricing
 - **Responsive Design** - Works on desktop, tablet, and mobile
+
+### Checkout (Stripe)
+- **Direct Order Savings** - Save up to 80% off dealer prices
+- **Secure Payment** - Powered by Stripe
+- **Cart Management** - Add/remove items, quantity controls
+- **Order Summary** - Real-time savings calculation
+- **Shipping Info** - Collect delivery details
 
 ### Seller Dashboard (Login Required)
 - **New Arrivals Tracker** - Real-time updates from local junkyards
@@ -29,6 +37,7 @@ A full-featured used car parts marketplace with seller dashboard, eBay integrati
 - HTML5
 - CSS3 (Custom properties, Grid, Flexbox)
 - Vanilla JavaScript (ES6+)
+- Stripe Elements for payments
 - eBay API integration (placeholder ready)
 
 ## Project Structure
@@ -37,10 +46,15 @@ A full-featured used car parts marketplace with seller dashboard, eBay integrati
 OutcastAutoParts/
 ├── index.html          # Main marketplace
 ├── login.html          # Seller dashboard (login required)
+├── checkout.html       # Stripe checkout page
+├── server.js           # Backend for Stripe PaymentIntents
+├── .env.example        # Environment variables template
 ├── css/
 │   └── style.css       # Industrial automotive theme
 ├── js/
 │   ├── app.js          # Marketplace functionality
+│   ├── cart.js         # Shared cart management
+│   ├── checkout.js     # Stripe checkout logic
 │   ├── dashboard.js    # Dashboard & seller tools
 │   └── ebay-api.js     # eBay API integration
 └── README.md
@@ -48,11 +62,37 @@ OutcastAutoParts/
 
 ## Getting Started
 
+### Frontend
 1. Clone the repository
 2. Open `index.html` in a browser for the marketplace
-3. Open `login.html` in a browser for the seller dashboard
+3. Open `checkout.html` to test the checkout flow
+4. Open `login.html` in a browser for the seller dashboard
 
-## eBay API Setup
+### Stripe Backend Setup
+The checkout page requires a backend to create Stripe PaymentIntents. A reference implementation is included in `server.js`.
+
+1. Create a Stripe account at https://stripe.com
+2. Get your publishable key and secret key from the Stripe Dashboard
+3. Update `STRIPE_PUBLISHABLE_KEY` in `js/checkout.js`
+4. Deploy the backend:
+   ```bash
+   npm init -y
+   npm install express cors stripe dotenv
+   cp .env.example .env
+   # Edit .env with your Stripe secret key
+   node server.js
+   ```
+5. Update `CREATE_PAYMENT_INTENT_URL` in `js/checkout.js` to point to your deployed backend
+
+### Deploying the Backend
+Deploy `server.js` to any Node.js host:
+- **Render** - Free tier available
+- **Fly.io** - Free tier available
+- **Vercel** - Free tier available
+- **Railway** - Free tier available
+- **Heroku** - Free tier available
+
+### eBay API Setup
 
 To enable real eBay integration:
 
@@ -71,9 +111,11 @@ To enable real eBay integration:
 
 ## Future Enhancements
 
+- [x] Stripe checkout integration
+- [x] Cart management
+- [x] Order savings display
 - [ ] User authentication & accounts
 - [ ] Real eBay API integration
-- [ ] Payment processing
 - [ ] Shipping label generation
 - [ ] Freight shipping module
 - [ ] Mobile app
