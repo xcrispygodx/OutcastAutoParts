@@ -1,6 +1,56 @@
 // Outcast Auto Parts - Seller Dashboard Logic
 
 // ============================================
+// Authentication
+// ============================================
+
+const VALID_USERNAME = 'OutcastAutoParts210';
+const VALID_PASSWORD = 'Aga6650284015Aga$';
+
+function handleLogin(event) {
+    event.preventDefault();
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    
+    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+        sessionStorage.setItem('outcast_auth', 'true');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        errorEl.style.display = 'none';
+        initDashboard();
+    } else {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Invalid username or password';
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem('outcast_auth');
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function checkAuth() {
+    if (sessionStorage.getItem('outcast_auth') === 'true') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        initDashboard();
+    } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboardContent').style.display = 'none';
+    }
+}
+
+function initDashboard() {
+    loadNewArrivals();
+    loadMyListings();
+    updateDashboardStats();
+}
+
+// ============================================
 // Data Stores
 // ============================================
 
@@ -406,6 +456,14 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================
+// Initialization
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+});
+
+// ============================================
 // Utility Functions
 // ============================================
 
@@ -418,8 +476,3 @@ function formatDate(dateString) {
     });
 }
 
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'index.html';
-    }
-}
