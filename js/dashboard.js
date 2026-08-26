@@ -5,8 +5,8 @@
 // ============================================
 
 const VALID_USERS = [
-    { username: 'OutcastAutoParts210', passwordHash: '40e995c57dc4922db961c2a579' },
-    { username: 'JesusAngel', passwordHash: '0a18abb1138fcca6f17590d095' }
+    { username: 'OutcastAutoParts210', passwordHash: '40e995c523b6dd2561c2a579' },
+    { username: 'JesusAngel', passwordHash: '0a18abb138fcca6f7590d095' }
 ];
 
 function simpleHash(str) {
@@ -16,9 +16,10 @@ function simpleHash(str) {
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash;
     }
-    return Math.abs(hash).toString(16).padStart(8, '0') + 
-           Math.abs(hash * 31).toString(16).padStart(8, '0') + 
-           Math.abs(hash * 37).toString(16).padStart(8, '0');
+    const h1 = Math.abs(hash).toString(16).padStart(8, '0');
+    const h2 = Math.abs((hash * 31) & 0xFFFFFFFF).toString(16).padStart(8, '0');
+    const h3 = Math.abs((hash * 37) & 0xFFFFFFFF).toString(16).padStart(8, '0');
+    return h1 + h2 + h3;
 }
 
 function verifyPassword(inputPassword, storedHash) {
@@ -31,9 +32,14 @@ function handleLogin(event) {
     const password = document.getElementById('loginPassword').value;
     const errorEl = document.getElementById('loginError');
     
+    console.log('Login attempt:', username);
+    console.log('Password hash:', simpleHash(password));
+    
     const isValid = VALID_USERS.some(user => 
         user.username === username && verifyPassword(password, user.passwordHash)
     );
+    
+    console.log('Login valid:', isValid);
     
     if (isValid) {
         sessionStorage.setItem('outcast_auth', 'true');
