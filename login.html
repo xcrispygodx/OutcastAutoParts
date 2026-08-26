@@ -143,26 +143,46 @@
         </div>
     </section>
 
-    <!-- New Arrivals from Local Yards -->
-    <section class="dashboard-section" id="new-arrivals">
+    <!-- Scavenger Hunt - Yard Arrivals -->
+    <section class="dashboard-section" id="scavenger-hunt">
         <div class="container">
             <div class="section-header">
                 <div>
-                    <h2>New Arrivals from Local Yards</h2>
-                    <p>Fresh inventory from partnered junkyards in your area</p>
+                    <h2>🎯 Scavenger Hunt - Yard Arrivals</h2>
+                    <p>Find high-dollar parts at local self-serve yards. Buy cheap, sell fast on eBay.</p>
                 </div>
                 <div class="section-actions">
-                    <button class="btn btn-secondary" onclick="refreshArrivals()">🔄 Refresh</button>
                     <select id="yardFilter" class="filter-select" onchange="filterYards()">
                         <option value="all">All Yards</option>
-                        <option value="yard1">Auto Salvage Co.</option>
-                        <option value="yard2">Metro Dismantling</option>
-                        <option value="yard3">Quality Auto Parts</option>
-                        <option value="yard4">Highway Auto Wreckers</option>
+                        <option value="wrench">Wrench-A-Part</option>
+                        <option value="roosevelt">Roosevelt U-Pull-It</option>
+                        <option value="auto-salvage">Auto Salvage Co.</option>
+                        <option value="metro">Metro Dismantling</option>
                     </select>
+                    <button class="btn btn-secondary" onclick="refreshArrivals()">🔄 Refresh</button>
                 </div>
             </div>
-            <div class="arrivals-grid" id="arrivalsGrid">
+
+            <!-- Yard Quick Links with Images -->
+            <div class="yard-quick-links">
+                <a href="https://wrenchapart.com" target="_blank" class="yard-link-card">
+                    <img src="https://via.placeholder.com/300x200/1a0b2e/ffd700?text=Wrench-A-Part" alt="Wrench-A-Part" class="yard-preview-img">
+                    <h4>Wrench-A-Part</h4>
+                    <p>Self-serve yard • View inventory →</p>
+                </a>
+                <a href="https://rooseveltupullit.com" target="_blank" class="yard-link-card">
+                    <img src="https://via.placeholder.com/300x200/1a0b2e/ffd700?text=Roosevelt+U-Pull-It" alt="Roosevelt U-Pull-It" class="yard-preview-img">
+                    <h4>Roosevelt U-Pull-It</h4>
+                    <p>Self-serve yard • View inventory →</p>
+                </a>
+                <a href="https://xcrispygodx.github.io/BIGDONGPARTS/" target="_blank" class="yard-link-card">
+                    <img src="https://via.placeholder.com/300x200/1a0b2e/ffd700?text=AutoAlchemy+Yard" alt="AutoAlchemy Yard" class="yard-preview-img">
+                    <h4>AutoAlchemy Yard</h4>
+                    <p>View vehicle photos & map →</p>
+                </a>
+            </div>
+
+            <div class="arrivals-grid arrivals-grid-large" id="arrivalsGrid">
                 <!-- Populated by JS -->
             </div>
         </div>

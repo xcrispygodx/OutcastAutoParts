@@ -4,10 +4,26 @@
 // Authentication
 // ============================================
 
-const VALID_CREDENTIALS = [
-    { username: 'OutcastAutoParts210', password: 'Aga6650284015Aga$' },
-    { username: 'JesusAngel', password: '6969P3nis' }
+const VALID_USERS = [
+    { username: 'OutcastAutoParts210', passwordHash: '40e995c57dc4922db961c2a579' },
+    { username: 'JesusAngel', passwordHash: '0a18abb1138fcca6f17590d095' }
 ];
+
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0') + 
+           Math.abs(hash * 31).toString(16).padStart(8, '0') + 
+           Math.abs(hash * 37).toString(16).padStart(8, '0');
+}
+
+function verifyPassword(inputPassword, storedHash) {
+    return simpleHash(inputPassword) === storedHash;
+}
 
 function handleLogin(event) {
     event.preventDefault();
@@ -15,8 +31,8 @@ function handleLogin(event) {
     const password = document.getElementById('loginPassword').value;
     const errorEl = document.getElementById('loginError');
     
-    const isValid = VALID_CREDENTIALS.some(cred => 
-        cred.username === username && cred.password === password
+    const isValid = VALID_USERS.some(user => 
+        user.username === username && verifyPassword(password, user.passwordHash)
     );
     
     if (isValid) {
@@ -73,67 +89,80 @@ let ebaySearchResults = [];
 
 // Sample yard data
 const yards = [
-    { id: 'yard1', name: 'Auto Salvage Co.', location: 'North Side' },
-    { id: 'yard2', name: 'Metro Dismantling', location: 'Downtown' },
-    { id: 'yard3', name: 'Quality Auto Parts', location: 'East Side' },
-    { id: 'yard4', name: 'Highway Auto Wreckers', location: 'West Side' }
+    { id: 'wrench', name: 'Wrench-A-Part', location: 'Austin, TX', url: 'https://wrenchapart.com', selfServe: true },
+    { id: 'roosevelt', name: 'Roosevelt U-Pull-It', location: 'San Antonio, TX', url: 'https://rooseveltupullit.com', selfServe: true },
+    { id: 'auto-salvage', name: 'Auto Salvage Co.', location: 'North Side', url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', selfServe: true },
+    { id: 'metro', name: 'Metro Dismantling', location: 'Downtown', url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', selfServe: true }
 ];
 
-// Sample arrivals
+// Sample arrivals - focused on high-dollar easy-ship parts
 const sampleArrivals = [
     {
         id: 1,
-        yardId: 'yard1',
-        yardName: 'Auto Salvage Co.',
+        yardId: 'wrench',
+        yardName: 'Wrench-A-Part',
+        yardUrl: 'https://wrenchapart.com',
+        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Wrench-A-Part',
         vehicle: '2019 Ford F-150 XLT',
         vin: '1FTEW1EP5KFA12345',
         date: '2025-08-25',
+        yardFee: '$12.00',
         parts: [
-            { name: 'Window Motor (Front Left)', partNumber: 'DS7Z-14529-B', easyShip: true, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
-            { name: 'Side View Mirror (Power)', partNumber: 'DS7Z-17683-AA', easyShip: true, compatibleModels: ['2015-2023 F-150', '2018-2023 Expedition'] },
-            { name: 'Brake Control Module', partNumber: 'DS7Z-2C220-B', easyShip: true, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
-            { name: 'Center Console', partNumber: 'DS7Z-78045A92A', easyShip: false, compatibleModels: ['2019 F-150 Only'] }
+            { name: 'Window Motor (Front Left)', partNumber: 'DS7Z-14529-B', easyShip: true, ebayPrice: 89.99, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
+            { name: 'Side View Mirror (Power)', partNumber: 'DS7Z-17683-AA', easyShip: true, ebayPrice: 65.00, compatibleModels: ['2015-2023 F-150', '2018-2023 Expedition'] },
+            { name: 'Brake Control Module', partNumber: 'DS7Z-2C220-B', easyShip: true, ebayPrice: 245.00, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
+            { name: 'Dash Insert (Climate Control)', partNumber: 'DS7Z-15650-A', easyShip: true, ebayPrice: 120.00, compatibleModels: ['2018-2023 F-150'] }
         ]
     },
     {
         id: 2,
-        yardId: 'yard2',
-        yardName: 'Metro Dismantling',
+        yardId: 'roosevelt',
+        yardName: 'Roosevelt U-Pull-It',
+        yardUrl: 'https://rooseveltupullit.com',
+        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
         vehicle: '2020 Chevrolet Silverado 1500',
         vin: '3GCPWCEF5LG123456',
         date: '2025-08-24',
+        yardFee: '$15.00',
         parts: [
-            { name: 'Transmission Control Module', partNumber: '24265798', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra 1500'] },
-            { name: 'ECU Engine Control Unit', partNumber: '12638177', easyShip: true, compatibleModels: ['2019-2023 Silverado 5.3L', '2019-2023 Sierra 5.3L'] },
-            { name: 'Sun Visor (Driver Side)', partNumber: '84176615', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra'] },
-            { name: 'Headlight Switch', partNumber: '84176615', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra', '2021-2023 Tahoe'] }
+            { name: 'Transmission Control Module', partNumber: '24265798', easyShip: true, ebayPrice: 195.00, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra 1500'] },
+            { name: 'ECU Engine Control Unit', partNumber: '12638177', easyShip: true, ebayPrice: 320.00, compatibleModels: ['2019-2023 Silverado 5.3L', '2019-2023 Sierra 5.3L'] },
+            { name: 'Headlight Switch', partNumber: '84176615', easyShip: true, ebayPrice: 45.00, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra', '2021-2023 Tahoe'] },
+            { name: 'Window Switch (Master)', partNumber: '84001-06150', easyShip: true, ebayPrice: 55.00, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra'] }
         ]
     },
     {
         id: 3,
-        yardId: 'yard3',
-        yardName: 'Quality Auto Parts',
+        yardId: 'auto-salvage',
+        yardName: 'Auto Salvage Co.',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=AutoAlchemy+Yard',
         vehicle: '2018 Toyota Camry SE',
         vin: '4T1B11HK5JU123789',
         date: '2025-08-23',
+        yardFee: '$10.00',
         parts: [
-            { name: 'Window Switch (Master)', partNumber: '84001-06150', easyShip: true, compatibleModels: ['2018-2022 Camry', '2019-2022 Avalon'] },
-            { name: 'Power Steering Control Module', partNumber: '89650-06120', easyShip: true, compatibleModels: ['2018-2022 Camry', '2019-2022 RAV4'] },
-            { name: 'Radio / Head Unit', partNumber: '86160-06120', easyShip: true, compatibleModels: ['2018-2022 Camry SE/XSE', '2019-2022 Avalon'] }
+            { name: 'Window Switch (Master)', partNumber: '84001-06150', easyShip: true, ebayPrice: 55.00, compatibleModels: ['2018-2022 Camry', '2019-2022 Avalon'] },
+            { name: 'Power Steering Control Module', partNumber: '89650-06120', easyShip: true, ebayPrice: 145.00, compatibleModels: ['2018-2022 Camry', '2019-2022 RAV4'] },
+            { name: 'Radio / Head Unit', partNumber: '86160-06120', easyShip: true, ebayPrice: 85.00, compatibleModels: ['2018-2022 Camry SE/XSE'] },
+            { name: 'Dash Indicator Cluster', partNumber: '83101-06120', easyShip: true, ebayPrice: 65.00, compatibleModels: ['2018-2022 Camry'] }
         ]
     },
     {
         id: 4,
-        yardId: 'yard4',
-        yardName: 'Highway Auto Wreckers',
+        yardId: 'metro',
+        yardName: 'Metro Dismantling',
+        yardUrl: 'https://xcrispygodx.github.io/BIGDONGPARTS/',
+        yardImage: 'https://via.placeholder.com/400x250/1a0b2e/ffd700?text=Metro+Dismantling',
         vehicle: '2021 Honda CR-V EX',
         vin: '2HKRW2H54MH123012',
         date: '2025-08-22',
+        yardFee: '$12.00',
         parts: [
-            { name: 'Side Mirror (Passenger)', partNumber: '76200-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2022-2024 CR-V'] },
-            { name: 'Window Regulator (Rear Left)', partNumber: '72210-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2017-2021 Accord'] },
-            { name: 'Sun Visor (Passenger)', partNumber: '83280-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V'] },
-            { name: 'ABS Control Module', partNumber: '57810-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2018-2021 Civic'] }
+            { name: 'Side Mirror (Passenger)', partNumber: '76200-TR3-A01', easyShip: true, ebayPrice: 65.00, compatibleModels: ['2017-2021 CR-V', '2022-2024 CR-V'] },
+            { name: 'Window Regulator (Rear Left)', partNumber: '72210-TR3-A01', easyShip: true, ebayPrice: 42.00, compatibleModels: ['2017-2021 CR-V', '2017-2021 Accord'] },
+            { name: 'Sun Visor (Passenger)', partNumber: '83280-TR3-A01', easyShip: true, ebayPrice: 28.00, compatibleModels: ['2017-2021 CR-V'] },
+            { name: 'ABS Control Module', partNumber: '57810-TR3-A01', easyShip: true, ebayPrice: 165.00, compatibleModels: ['2017-2021 CR-V', '2018-2021 Civic'] }
         ]
     }
 ];
@@ -254,12 +283,25 @@ function loadNewArrivals(yardFilter = 'all') {
         arrivals = arrivals.filter(a => a.yardId === yardFilter);
     }
     
-    grid.innerHTML = arrivals.map(arrival => `
-        <div class="arrival-card">
+    grid.innerHTML = arrivals.map(arrival => {
+        const totalEbay = arrival.parts.reduce((sum, p) => sum + (p.ebayPrice || 0), 0);
+        const yardFee = parseFloat(arrival.yardFee) || 12;
+        const potentialProfit = totalEbay - yardFee;
+        
+        return `
+        <div class="arrival-card arrival-card-large">
             <span class="arrival-badge">NEW</span>
-            <div class="arrival-yard">${arrival.yardName}</div>
-            <div class="arrival-vehicle">${arrival.vehicle}</div>
-            <div class="arrival-date">Arrived: ${formatDate(arrival.date)}</div>
+            <div class="arrival-yard-header">
+                <a href="${arrival.yardUrl}" target="_blank" class="arrival-yard-link">
+                    <img src="${arrival.yardImage}" alt="${arrival.yardName}" class="arrival-yard-img" onerror="this.src='https://via.placeholder.com/400x200/1a0b2e/ffd700?text=${encodeURIComponent(arrival.yardName)}'">
+                </a>
+                <div class="arrival-yard-info">
+                    <div class="arrival-yard">${arrival.yardName}</div>
+                    <div class="arrival-vehicle">${arrival.vehicle}</div>
+                    <div class="arrival-date">Arrived: ${formatDate(arrival.date)}</div>
+                    <div class="arrival-yard-fee">Yard Fee: ${arrival.yardFee}</div>
+                </div>
+            </div>
             <ul class="arrival-parts">
                 ${arrival.parts.map(part => `
                     <li>
@@ -267,12 +309,17 @@ function loadNewArrivals(yardFilter = 'all') {
                         <span class="arrival-part-badge ${part.easyShip ? '' : 'freight'}">
                             ${part.easyShip ? '📦 Easy Ship' : '🚚 Freight'}
                         </span>
+                        <span class="arrival-part-price">$${(part.ebayPrice || 0).toFixed(2)}</span>
                     </li>
                 `).join('')}
             </ul>
+            <div class="arrival-profit-bar">
+                <div class="arrival-profit-label">Potential Profit</div>
+                <div class="arrival-profit-value">$${potentialProfit.toFixed(2)}</div>
+            </div>
             <div class="arrival-actions">
                 <button class="btn btn-primary" onclick="viewArrivalDetails(${arrival.id})">View Details</button>
-                <a href="https://xcrispygodx.github.io/BIGDONGPARTS/" target="_blank" class="btn btn-secondary">🏭 View on Yard</a>
+                <a href="${arrival.yardUrl}" target="_blank" class="btn btn-secondary">🏭 View on Yard</a>
                 <button class="btn btn-secondary" onclick="createListingFromArrival(${arrival.id})">Create Listing</button>
             </div>
         </div>
