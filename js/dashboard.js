@@ -48,6 +48,8 @@ function initDashboard() {
     loadNewArrivals();
     loadMyListings();
     updateDashboardStats();
+    initAnalytics();
+    loadHighCompatibility();
 }
 
 // ============================================
@@ -76,10 +78,10 @@ const sampleArrivals = [
         vin: '1FTEW1EP5KFA12345',
         date: '2025-08-25',
         parts: [
-            { name: 'Window Motor (Front Left)', partNumber: 'DS7Z-14529-B', easyShip: true },
-            { name: 'Side View Mirror (Power)', partNumber: 'DS7Z-17683-AA', easyShip: true },
-            { name: 'Brake Control Module', partNumber: 'DS7Z-2C220-B', easyShip: true },
-            { name: 'Center Console', partNumber: 'DS7Z-78045A92A', easyShip: false }
+            { name: 'Window Motor (Front Left)', partNumber: 'DS7Z-14529-B', easyShip: true, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
+            { name: 'Side View Mirror (Power)', partNumber: 'DS7Z-17683-AA', easyShip: true, compatibleModels: ['2015-2023 F-150', '2018-2023 Expedition'] },
+            { name: 'Brake Control Module', partNumber: 'DS7Z-2C220-B', easyShip: true, compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'] },
+            { name: 'Center Console', partNumber: 'DS7Z-78045A92A', easyShip: false, compatibleModels: ['2019 F-150 Only'] }
         ]
     },
     {
@@ -90,10 +92,10 @@ const sampleArrivals = [
         vin: '3GCPWCEF5LG123456',
         date: '2025-08-24',
         parts: [
-            { name: 'Transmission Control Module', partNumber: '24265798', easyShip: true },
-            { name: 'ECU Engine Control Unit', partNumber: '12638177', easyShip: true },
-            { name: 'Sun Visor (Driver Side)', partNumber: '84176615', easyShip: true },
-            { name: 'Headlight Switch', partNumber: '84176615', easyShip: true }
+            { name: 'Transmission Control Module', partNumber: '24265798', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra 1500'] },
+            { name: 'ECU Engine Control Unit', partNumber: '12638177', easyShip: true, compatibleModels: ['2019-2023 Silverado 5.3L', '2019-2023 Sierra 5.3L'] },
+            { name: 'Sun Visor (Driver Side)', partNumber: '84176615', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra'] },
+            { name: 'Headlight Switch', partNumber: '84176615', easyShip: true, compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra', '2021-2023 Tahoe'] }
         ]
     },
     {
@@ -104,9 +106,9 @@ const sampleArrivals = [
         vin: '4T1B11HK5JU123789',
         date: '2025-08-23',
         parts: [
-            { name: 'Window Switch (Master)', partNumber: '84001-06150', easyShip: true },
-            { name: 'Power Steering Control Module', partNumber: '89650-06120', easyShip: true },
-            { name: 'Radio / Head Unit', partNumber: '86160-06120', easyShip: true }
+            { name: 'Window Switch (Master)', partNumber: '84001-06150', easyShip: true, compatibleModels: ['2018-2022 Camry', '2019-2022 Avalon'] },
+            { name: 'Power Steering Control Module', partNumber: '89650-06120', easyShip: true, compatibleModels: ['2018-2022 Camry', '2019-2022 RAV4'] },
+            { name: 'Radio / Head Unit', partNumber: '86160-06120', easyShip: true, compatibleModels: ['2018-2022 Camry SE/XSE', '2019-2022 Avalon'] }
         ]
     },
     {
@@ -117,11 +119,87 @@ const sampleArrivals = [
         vin: '2HKRW2H54MH123012',
         date: '2025-08-22',
         parts: [
-            { name: 'Side Mirror (Passenger)', partNumber: '76200-TR3-A01', easyShip: true },
-            { name: 'Window Regulator (Rear Left)', partNumber: '72210-TR3-A01', easyShip: true },
-            { name: 'Sun Visor (Passenger)', partNumber: '83280-TR3-A01', easyShip: true },
-            { name: 'ABS Control Module', partNumber: '57810-TR3-A01', easyShip: true }
+            { name: 'Side Mirror (Passenger)', partNumber: '76200-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2022-2024 CR-V'] },
+            { name: 'Window Regulator (Rear Left)', partNumber: '72210-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2017-2021 Accord'] },
+            { name: 'Sun Visor (Passenger)', partNumber: '83280-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V'] },
+            { name: 'ABS Control Module', partNumber: '57810-TR3-A01', easyShip: true, compatibleModels: ['2017-2021 CR-V', '2018-2021 Civic'] }
         ]
+    }
+];
+
+// High compatibility parts data
+const highCompatibilityParts = [
+    {
+        id: 1,
+        name: 'Window Motor (Front Left)',
+        partNumber: 'DS7Z-14529-B',
+        compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty', '2018-2023 Expedition'],
+        fitCount: 3,
+        avgEbayPrice: 85,
+        avgYardPrice: 35,
+        profitMargin: 142,
+        easyShip: true,
+        category: 'electrical'
+    },
+    {
+        id: 2,
+        name: 'Side View Mirror (Power)',
+        partNumber: 'DS7Z-17683-AA',
+        compatibleModels: ['2015-2023 F-150', '2018-2023 Expedition', '2021-2023 Bronco'],
+        fitCount: 3,
+        avgEbayPrice: 65,
+        avgYardPrice: 28,
+        profitMargin: 132,
+        easyShip: true,
+        category: 'body'
+    },
+    {
+        id: 3,
+        name: 'Headlight Switch',
+        partNumber: '84176615',
+        compatibleModels: ['2019-2023 Silverado', '2019-2023 Sierra', '2021-2023 Tahoe', '2021-2023 Suburban'],
+        fitCount: 4,
+        avgEbayPrice: 45,
+        avgYardPrice: 18,
+        profitMargin: 150,
+        easyShip: true,
+        category: 'electrical'
+    },
+    {
+        id: 4,
+        name: 'Window Switch (Master)',
+        partNumber: '84001-06150',
+        compatibleModels: ['2018-2022 Camry', '2019-2022 Avalon', '2020-2022 Highlander'],
+        fitCount: 3,
+        avgEbayPrice: 55,
+        avgYardPrice: 22,
+        profitMargin: 150,
+        easyShip: true,
+        category: 'electrical'
+    },
+    {
+        id: 5,
+        name: 'ABS Control Module',
+        partNumber: '57810-TR3-A01',
+        compatibleModels: ['2017-2021 CR-V', '2018-2021 Civic', '2020-2021 Pilot'],
+        fitCount: 3,
+        avgEbayPrice: 165,
+        avgYardPrice: 65,
+        profitMargin: 154,
+        easyShip: true,
+        category: 'electrical'
+    },
+    {
+        id: 6,
+        name: 'Brake Control Module',
+        partNumber: 'DS7Z-2C220-B',
+        compatibleModels: ['2015-2023 F-150', '2017-2023 Super Duty'],
+        fitCount: 2,
+        avgEbayPrice: 165,
+        avgYardPrice: 55,
+        profitMargin: 200,
+        easyShip: true,
+        category: 'brakes'
     }
 ];
 
@@ -174,8 +252,8 @@ function loadNewArrivals(yardFilter = 'all') {
             <ul class="arrival-parts">
                 ${arrival.parts.map(part => `
                     <li>
-                        <span>${part.name}</span>
-                        <span style="color: var(--primary); font-size: 0.8rem;">
+                        <span class="arrival-part-name">${part.name}</span>
+                        <span class="arrival-part-badge ${part.easyShip ? '' : 'freight'}">
                             ${part.easyShip ? '📦 Easy Ship' : '🚚 Freight'}
                         </span>
                     </li>
@@ -220,6 +298,242 @@ function createListingFromArrival(arrivalId) {
     // Pre-fill the add listing modal
     document.getElementById('listingVehicle').value = arrival.vehicle;
     document.getElementById('addListingModal').classList.add('active');
+}
+
+// ============================================
+// Analytics & Charts
+// ============================================
+
+function initAnalytics() {
+    initPricingTrendChart();
+    initYardArrivalsChart();
+    initProfitMarginsChart();
+    initShippingTypeChart();
+}
+
+function initPricingTrendChart() {
+    const ctx = document.getElementById('pricingTrendChart');
+    if (!ctx) return;
+    
+    const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const windowMotorData = [75, 78, 82, 85];
+    const brakeModuleData = [140, 155, 160, 165];
+    const ecuData = [260, 270, 275, 280];
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Window Motor',
+                    data: windowMotorData,
+                    borderColor: '#ff6b00',
+                    backgroundColor: 'rgba(255, 107, 0, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Brake Module',
+                    data: brakeModuleData,
+                    borderColor: '#ffb700',
+                    backgroundColor: 'rgba(255, 183, 0, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'ECU',
+                    data: ecuData,
+                    borderColor: '#16a34a',
+                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#f0e6d2', font: { family: 'Inter' } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#8a8a8a' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                },
+                x: {
+                    ticks: { color: '#8a8a8a' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                }
+            }
+        }
+    });
+}
+
+function initYardArrivalsChart() {
+    const ctx = document.getElementById('yardArrivalsChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Parts Arrived',
+                data: [12, 19, 8, 15, 22, 18, 10],
+                backgroundColor: 'rgba(255, 107, 0, 0.7)',
+                borderColor: '#ff6b00',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#f0e6d2', font: { family: 'Inter' } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#8a8a8a' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                },
+                x: {
+                    ticks: { color: '#8a8a8a' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                }
+            }
+        }
+    });
+}
+
+function initProfitMarginsChart() {
+    const ctx = document.getElementById('profitMarginsChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Electrical', 'Body', 'Brakes', 'Interior', 'Engine'],
+            datasets: [{
+                data: [35, 25, 20, 12, 8],
+                backgroundColor: [
+                    'rgba(255, 107, 0, 0.8)',
+                    'rgba(255, 183, 0, 0.8)',
+                    'rgba(22, 163, 74, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ],
+                borderColor: '#1a1a1a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { color: '#f0e6d2', font: { family: 'Inter', size: 11 } }
+                }
+            }
+        }
+    });
+}
+
+function initShippingTypeChart() {
+    const ctx = document.getElementById('shippingTypeChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Easy Ship', 'Freight'],
+            datasets: [{
+                data: [78, 22],
+                backgroundColor: [
+                    'rgba(22, 163, 74, 0.8)',
+                    'rgba(255, 107, 0, 0.8)'
+                ],
+                borderColor: '#1a1a1a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { color: '#f0e6d2', font: { family: 'Inter', size: 11 } }
+                }
+            }
+        }
+    });
+}
+
+// ============================================
+// High Compatibility Section
+// ============================================
+
+function loadHighCompatibility(makeFilter = 'all') {
+    const grid = document.getElementById('compatGrid');
+    if (!grid) return;
+    
+    let parts = highCompatibilityParts;
+    if (makeFilter !== 'all') {
+        parts = parts.filter(p => p.compatibleModels.some(m => m.toLowerCase().includes(makeFilter)));
+    }
+    
+    parts.sort((a, b) => b.fitCount - a.fitCount);
+    
+    grid.innerHTML = parts.map(part => `
+        <div class="compat-card">
+            <div class="compat-header">
+                <div>
+                    <div class="compat-part-name">${part.name}</div>
+                    <div class="compat-models">${part.compatibleModels.slice(0, 3).join(' · ')}</div>
+                </div>
+                <span class="compat-fit-count">${part.fitCount} Models</span>
+            </div>
+            <div class="compat-pricing">
+                <div class="compat-price-block">
+                    <div class="compat-price-label">Avg eBay Price</div>
+                    <div class="compat-price-value">$${part.avgEbayPrice}</div>
+                </div>
+                <div class="compat-price-block">
+                    <div class="compat-price-label">Avg Yard Price</div>
+                    <div class="compat-price-value">$${part.avgYardPrice}</div>
+                </div>
+                <div class="compat-price-block">
+                    <div class="compat-price-label">Potential Profit</div>
+                    <div class="compat-price-value profit">+${part.profitMargin}%</div>
+                </div>
+                <div class="compat-price-block">
+                    <div class="compat-price-label">Shipping</div>
+                    <div class="compat-price-value" style="font-size: 0.9rem;">
+                        ${part.easyShip ? '📦 Easy' : '🚚 Freight'}
+                    </div>
+                </div>
+            </div>
+            <div class="compat-actions">
+                <button class="btn btn-primary" onclick="showAddListingModal()">Create Listing</button>
+                <button class="btn btn-secondary" onclick="searchEbayForPart('${part.name}')">Check eBay</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterCompatibility() {
+    const makeFilter = document.getElementById('compatMakeFilter').value;
+    loadHighCompatibility(makeFilter);
+}
+
+function searchEbayForPart(partName) {
+    document.getElementById('ebayPartSearch').value = partName;
+    document.getElementById('ebay-search').scrollIntoView({ behavior: 'smooth' });
+    searchEbayParts();
 }
 
 // ============================================

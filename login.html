@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - Outcast Auto Parts</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="dashboard-body">
     <!-- Login Screen -->
@@ -157,6 +158,69 @@
                 <div class="ebay-grid" id="ebayGrid">
                     <!-- Populated by JS -->
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Overview -->
+    <section class="dashboard-section" id="analytics">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>📊 Buying Analytics</h2>
+                    <p>Graph overview of pricing trends, yard arrivals, and profit opportunities</p>
+                </div>
+            </div>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Parts Pricing Trends (Last 30 Days)</h3>
+                    <div class="chart-container">
+                        <canvas id="pricingTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Yard Arrivals by Day</h3>
+                    <div class="chart-container">
+                        <canvas id="yardArrivalsChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Profit Margins by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="profitMarginsChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Easy Ship vs Freight</h3>
+                    <div class="chart-container">
+                        <canvas id="shippingTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- High Compatibility Section -->
+    <section class="dashboard-section" id="high-compatibility">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>🔧 High Compatibility Parts</h2>
+                    <p>Parts that fit multiple models - compare with new yard arrivals for maximum profit</p>
+                </div>
+                <div class="section-actions">
+                    <select id="compatMakeFilter" class="filter-select" onchange="filterCompatibility()">
+                        <option value="all">All Makes</option>
+                        <option value="ford">Ford</option>
+                        <option value="chevrolet">Chevrolet</option>
+                        <option value="toyota">Toyota</option>
+                        <option value="honda">Honda</option>
+                        <option value="nissan">Nissan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="compat-grid" id="compatGrid">
+                <!-- Populated by JS -->
             </div>
         </div>
     </section>
