@@ -28,11 +28,20 @@ const YARD_IMAGES = {
         'https://wrenchapart.com/images/wrench-a-part.png',
         'https://wrenchapart.com/images/Website-Banner.avif'
     ],
-    'https://rooseveltupullit.com': [
-        'https://placehold.co/600x400/1a0b2e/ffd700?text=Roosevelt+U-Pull-It'
+    'https://www.picknpullsa.com': [
+        'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430'
+    ],
+    'https://www.picknpullsa.com/inventory': [
+        'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430'
     ],
     'https://xcrispygodx.github.io/BIGDONGPARTS/': [
         'https://placehold.co/600x400/1a0b2e/ffd700?text=AutoAlchemy+Yard'
+    ],
+    'https://www.picknpullsa.com': [
+        'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430'
+    ],
+    'https://www.picknpullsa.com/inventory': [
+        'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430'
     ]
 };
 
@@ -174,7 +183,7 @@ async function fetchYardImages(yardUrl) {
     }
 
     try {
-        const response = await fetch(`${YARD_IMAGE_API}?url=${encodeURIComponent(yardUrl)}`);
+        const response = await fetch(`${YARD_IMAGE_API}?url=${encodeURIComponent(yardUrl)}&mode=recent`);
         if (!response.ok) throw new Error('Failed to fetch yard images');
         const data = await response.json();
         const images = data.images || [];
@@ -192,8 +201,8 @@ async function fetchYardImages(yardUrl) {
 async function updateYardPreviewImages() {
     const yardLinks = document.querySelectorAll('.yard-link-card');
     const yardUrls = [
-        { url: 'https://wrenchapart.com', name: 'Wrench-A-Part' },
-        { url: 'https://rooseveltupullit.com', name: 'Roosevelt U-Pull-It' },
+        { url: 'https://wrenchapart.com/vehicle-search', name: 'Wrench-A-Part' },
+        { url: 'https://www.picknpullsa.com/inventory', name: 'Pick-N-Pull San Antonio' },
         { url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', name: 'AutoAlchemy Yard' }
     ];
 
@@ -202,35 +211,19 @@ async function updateYardPreviewImages() {
         const yard = yardUrls[i];
         if (!yard) continue;
 
-        const loadingEl = link.querySelector('.yard-preview-loading');
-        const img = link.querySelector('.yard-preview-real');
+        const img = link.querySelector('.yard-preview-img');
         if (!img) continue;
 
         try {
             const images = await fetchYardImages(yard.url);
             if (images.length > 0) {
                 img.src = images[0];
-                img.style.display = 'block';
-                if (loadingEl) loadingEl.style.display = 'none';
                 img.onerror = function() {
-                    this.style.display = 'none';
-                    if (loadingEl) {
-                        loadingEl.textContent = 'Image unavailable';
-                        loadingEl.style.display = 'flex';
-                    }
+                    this.src = `https://placehold.co/300x200/1a0b2e/ffd700?text=${encodeURIComponent(yard.name)}`;
                 };
-            } else {
-                if (loadingEl) {
-                    loadingEl.textContent = 'No yard photos available';
-                    loadingEl.style.display = 'flex';
-                }
             }
         } catch (error) {
             console.error('Failed to update yard image for', yard.name, error);
-            if (loadingEl) {
-                loadingEl.textContent = 'Failed to load';
-                loadingEl.style.display = 'flex';
-            }
         }
     }
 }
@@ -641,7 +634,7 @@ let ebaySearchResults = [];
 // Sample yard data
 const yards = [
     { id: 'wrench', name: 'Wrench-A-Part', location: 'Austin, TX', url: 'https://wrenchapart.com', selfServe: true },
-    { id: 'roosevelt', name: 'Roosevelt U-Pull-It', location: 'San Antonio, TX', url: 'https://rooseveltupullit.com', selfServe: true },
+    { id: 'picknpull', name: 'Pick-N-Pull San Antonio', location: 'San Antonio, TX', url: 'https://www.picknpullsa.com/inventory', selfServe: true },
     { id: 'auto-salvage', name: 'Auto Salvage Co.', location: 'North Side', url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', selfServe: true },
     { id: 'metro', name: 'Metro Dismantling', location: 'Downtown', url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', selfServe: true }
 ];
@@ -667,10 +660,10 @@ const sampleArrivals = [
     },
     {
         id: 2,
-        yardId: 'roosevelt',
-        yardName: 'Roosevelt U-Pull-It',
-        yardUrl: 'https://rooseveltupullit.com',
-        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        yardId: 'picknpull',
+        yardName: 'Pick-N-Pull San Antonio',
+        yardUrl: 'https://www.picknpullsa.com/inventory',
+        yardImage: 'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430',
         vehicle: '2020 Chevrolet Silverado 1500',
         vin: '3GCPWCEF5LG123456',
         date: '2025-08-24',
@@ -735,10 +728,10 @@ const sampleArrivals = [
     },
     {
         id: 6,
-        yardId: 'roosevelt',
-        yardName: 'Roosevelt U-Pull-It',
-        yardUrl: 'https://rooseveltupullit.com',
-        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        yardId: 'picknpull',
+        yardName: 'Pick-N-Pull San Antonio',
+        yardUrl: 'https://www.picknpullsa.com/inventory',
+        yardImage: 'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430',
         vehicle: '2017 Nissan Altima 2.5 SL',
         vin: '1N4AL3AP4HN123456',
         date: '2025-08-20',
@@ -803,10 +796,10 @@ const sampleArrivals = [
     },
     {
         id: 10,
-        yardId: 'roosevelt',
-        yardName: 'Roosevelt U-Pull-It',
-        yardUrl: 'https://rooseveltupullit.com',
-        yardImage: 'https://placehold.co/400x250/1a0b2e/ffd700?text=Roosevelt+U-Pull-It',
+        yardId: 'picknpull',
+        yardName: 'Pick-N-Pull San Antonio',
+        yardUrl: 'https://www.picknpullsa.com/inventory',
+        yardImage: 'https://www.picknpullsa.com/assets/img/logo.png?v=1785233430',
         vehicle: '2021 BMW 330i xDrive',
         vin: 'WBA53BP09MCN12345',
         date: '2025-08-16',
@@ -1114,6 +1107,12 @@ function refreshArrivals() {
         btn.disabled = false;
         btn.textContent = '🔄 Refresh';
     }, 1500);
+}
+
+function manualRefreshArrivals() {
+    const yardFilter = document.getElementById('yardFilter')?.value || 'all';
+    simulateLiveArrival();
+    loadNewArrivalsFromLive(yardFilter);
 }
 
 function loadNewArrivalsFromLive(yardFilter = 'all') {

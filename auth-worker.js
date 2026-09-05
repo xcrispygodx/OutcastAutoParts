@@ -11,8 +11,6 @@ const CORS_HEADERS = {
   'Access-Control-Max-Age': '86400'
 };
 
-const AUTH_KV = typeof AUTH !== 'undefined' ? AUTH : undefined;
-
 function kvNotConfiguredResponse() {
   return new Response(JSON.stringify({ error: 'KV namespace not configured. Run: wrangler kv namespace create AUTH' }), {
     status: 500,
@@ -27,10 +25,10 @@ async function hashPassword(password, salt) {
     encoder.encode(password),
     'PBKDF2',
     false,
-    ['deriveBits', 'deriveKey']
+    ['deriveBits']
   );
   
-  const hash = await crypto.subtle.deriveKey(
+  const hashBuffer = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
       salt: encoder.encode(salt),
@@ -38,12 +36,9 @@ async function hashPassword(password, salt) {
       hash: 'SHA-256'
     },
     keyMaterial,
-    { name: 'HMAC', hash: 'SHA-256', length: 256 },
-    false,
-    ['sign']
+    256
   );
   
-  const hashBuffer = await crypto.subtle.exportKey('raw', hash);
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
@@ -68,7 +63,8 @@ function errorResponse(message, status = 400) {
   return jsonResponse({ error: message }, status);
 }
 
-async function handleRegister(request) {
+async function handleRegister(request, env) {
+  const AUTH_KV = env?.AUTH;
   if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const { username, email, password, accountType } = await request.json();
@@ -125,7 +121,8 @@ async function handleRegister(request) {
   }
 }
 
-async function handleLogin(request) {
+async function handleLogin(request, env) {
+  const AUTH_KV = env?.AUTH;
   if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const { username, password } = await request.json();
@@ -165,7 +162,8 @@ async function handleLogin(request) {
   }
 }
 
-async function handleVerify(request) {
+async function handleVerify(request, env) {
+  const AUTH_KV = env?.AUTH;
   if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const authHeader = request.headers.get('Authorization');
@@ -204,7 +202,8 @@ async function handleVerify(request) {
   }
 }
 
-async function handleLogout(request) {
+async function handleLogout(request, env) {
+  const AUTH_KV = env?.AUTH;
   if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const authHeader = request.headers.get('Authorization');
@@ -218,10 +217,11 @@ async function handleLogout(request) {
   }
 }
 
-async function handleYardImages(request) {
+async function handleYardImages(request, env) {
   try {
     const url = new URL(request.url);
     const targetUrl = url.searchParams.get('url');
+    const mode = url.searchParams.get('mode') || 'gallery';
     
     if (!targetUrl) {
       return errorResponse('URL parameter required', 400);
@@ -241,30 +241,62 @@ async function handleYardImages(request) {
     const html = await response.text();
     const imageUrls = [];
     
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let match;
-    while ((match = imgRegex.exec(html)) !== null) {
-      let src = match[1];
-      if (src && !src.startsWith('data:')) {
-        if (src.startsWith('//')) {
-          src = 'https:' + src;
-        } else if (src.startsWith('/')) {
-          const baseUrl = new URL(targetUrl);
-          src = baseUrl.origin + src;
-        } else if (!src.startsWith('http')) {
-          const baseUrl = new URL(targetUrl);
-          src = baseUrl.origin + '/' + src;
-        }
-        if (!imageUrls.includes(src)) {
-          imageUrls.push(src);
+    if (mode === 'recent') {
+      const recentMatch = html.match(/href=["']([^"']*recent-arrivals[^"']*)["']/i);
+      if (recentMatch && recentMatch[1]) {
+        const recentUrl = new URL(recentMatch[1], targetUrl).href;
+        const recentResponse = await fetch(recentUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; OutcastAutoParts/1.0)',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+          }
+        });
+        
+        if (recentResponse.ok) {
+          const recentHtml = await recentResponse.text();
+          const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+          let match;
+          while ((match = imgRegex.exec(recentHtml)) !== null) {
+            let src = match[1];
+            if (src && !src.startsWith('data:')) {
+              if (src.startsWith('//')) {
+                src = 'https:' + src;
+              } else if (src.startsWith('/')) {
+                const baseUrl = new URL(targetUrl);
+                src = baseUrl.origin + src;
+              } else if (!src.startsWith('http')) {
+                const baseUrl = new URL(targetUrl);
+                src = baseUrl.origin + '/' + src;
+              }
+              if (!imageUrls.includes(src)) {
+                imageUrls.push(src);
+              }
+            }
+          }
         }
       }
     }
     
-    const ogImageRegex = /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["'][^>]*>/i;
-    const ogMatch = html.match(ogImageRegex);
-    if (ogMatch && ogMatch[1]) {
-      imageUrls.unshift(ogMatch[1]);
+    if (imageUrls.length === 0) {
+      const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+      let match;
+      while ((match = imgRegex.exec(html)) !== null) {
+        let src = match[1];
+        if (src && !src.startsWith('data:')) {
+          if (src.startsWith('//')) {
+            src = 'https:' + src;
+          } else if (src.startsWith('/')) {
+            const baseUrl = new URL(targetUrl);
+            src = baseUrl.origin + src;
+          } else if (!src.startsWith('http')) {
+            const baseUrl = new URL(targetUrl);
+            src = baseUrl.origin + '/' + src;
+          }
+          if (!imageUrls.includes(src)) {
+            imageUrls.push(src);
+          }
+        }
+      }
     }
     
     const sortedImages = imageUrls.slice(0, 20);
@@ -281,7 +313,7 @@ async function handleYardImages(request) {
   }
 }
 
-async function handleRequest(request) {
+async function handleRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
   
@@ -290,27 +322,32 @@ async function handleRequest(request) {
   }
   
   if (path === '/auth/register' && request.method === 'POST') {
-    return handleRegister(request);
+    return handleRegister(request, env);
   }
   
   if (path === '/auth/login' && request.method === 'POST') {
-    return handleLogin(request);
+    return handleLogin(request, env);
   }
   
   if (path === '/auth/verify' && request.method === 'GET') {
-    return handleVerify(request);
+    return handleVerify(request, env);
   }
   
   if (path === '/auth/logout' && request.method === 'POST') {
-    return handleLogout(request);
+    return handleLogout(request, env);
   }
   
   if (path === '/yard-images' && request.method === 'GET') {
-    return handleYardImages(request);
+    return handleYardImages(request, env);
   }
   
   if (path === '/' && request.method === 'GET') {
-    return new Response(JSON.stringify({ service: 'Outcast Auto Parts Auth API', status: 'ok' }), {
+    return new Response(JSON.stringify({ 
+      service: 'Outcast Auto Parts Auth API', 
+      status: 'ok',
+      authKv: env?.AUTH ? 'bound' : 'missing',
+      authType: typeof env?.AUTH
+    }), {
       headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
     });
   }
@@ -319,5 +356,7 @@ async function handleRequest(request) {
 }
 
 export default {
-  fetch: handleRequest
+  fetch(request, env, ctx) {
+    return handleRequest(request, env);
+  }
 };
