@@ -19,7 +19,7 @@ const EBAY_CONFIG = {
 };
 
 const ARRIVAL_REFRESH_INTERVAL = 30000; // 30 seconds
-const YARD_IMAGE_API = 'https://outcast-auto-parts-auth.your-subdomain.workers.dev/yard-images';
+const YARD_IMAGE_API = 'https://outcast-auto-parts-auth.outcast-auto-parts.workers.dev/yard-images';
 const YARD_IMAGE_CACHE_TTL = 3600000;
 const yardImageCache = new Map();
 

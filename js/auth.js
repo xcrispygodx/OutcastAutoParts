@@ -2,8 +2,8 @@
 // Communicates with Cloudflare Worker for secure authentication
 
 const AuthAPI = {
-  baseUrl: 'https://outcast-auto-parts-auth.your-subdomain.workers.dev',
-  useLocalFallback: true,
+  baseUrl: 'https://outcast-auto-parts-auth.outcast-auto-parts.workers.dev',
+  useLocalFallback: false,
   localUsers: [
     { username: 'OutcastAutoParts210', passwordHash: '40e995c523b6dd2561c2a579' },
     { username: 'JesusAngel', passwordHash: '0a18abb138fcca6f7590d095' }

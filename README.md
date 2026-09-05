@@ -112,7 +112,7 @@ Customer and seller accounts are secured with a Cloudflare Worker + KV backend:
 3. Copy the KV namespace ID into `wrangler.toml`
 4. Update the worker URL in `js/auth.js` and `js/dashboard.js`:
     ```javascript
-    baseUrl: 'https://outcast-auto-parts-auth.your-subdomain.workers.dev'
+    baseUrl: 'https://outcast-auto-parts-auth.outcast-auto-parts.workers.dev'
     ```
 5. Deploy the worker: `wrangler deploy`
 6. The site now supports secure registration, login, logout, and session verification
@@ -132,6 +132,8 @@ The dashboard fetches live preview images from linked junkyard sites through a C
 - Extracts up to 20 images from the target page
 - 1-hour browser cache to avoid repeated fetches
 - Fallback to branded placeholders if no images are found
+
+Worker URL: `https://outcast-auto-parts-auth.outcast-auto-parts.workers.dev`
 
 To enable:
 1. Deploy the auth worker with `wrangler deploy`
