@@ -1,0 +1,28 @@
+{
+  "name": "outcastautoparts",
+  "version": "1.0.0",
+  "description": "A full-featured used car parts marketplace with seller dashboard, eBay integration, local junkyard inventory tracking, and Stripe checkout.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xcrispygodx/OutcastAutoParts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/xcrispygodx/OutcastAutoParts/issues"
+  },
+  "homepage": "https://github.com/xcrispygodx/OutcastAutoParts#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "stripe": "^22.6.1"
+  }
+}

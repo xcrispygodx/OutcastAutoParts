@@ -48,7 +48,10 @@ app.post('/api/create-payment-intent', async (req, res) => {
                 items: JSON.stringify(items),
                 shipping_name: shipping.name,
                 shipping_email: shipping.email,
-                shipping_address: JSON.stringify(shipping.address)
+                shipping_address: JSON.stringify(shipping.address),
+                shipping_method: shipping.method || 'standard',
+                shipping_notes: shipping.notes || '',
+                has_local_delivery: items.some(i => i.localDelivery) ? 'true' : 'false'
             }
         });
 

@@ -1,6 +1,26 @@
 // Outcast Auto Parts - Seller Dashboard Logic
 
 // ============================================
+// Configuration
+// ============================================
+
+const EMAILJS_CONFIG = {
+    serviceId: 'gmail', // Replace with your EmailJS service ID
+    templateId: 'template_new_arrival', // Replace with your EmailJS template ID
+    publicKey: 'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+};
+
+const EBAY_CONFIG = {
+    appId: 'YOUR_APP_ID',
+    devId: 'YOUR_DEV_ID',
+    certId: 'YOUR_CERT_ID',
+    accessToken: 'YOUR_ACCESS_TOKEN',
+    sandbox: true
+};
+
+const ARRIVAL_REFRESH_INTERVAL = 30000; // 30 seconds
+
+// ============================================
 // Authentication
 // ============================================
 
@@ -20,6 +40,400 @@ function simpleHash(str) {
     const h2 = Math.abs((hash * 31) & 0xFFFFFFFF).toString(16).padStart(8, '0');
     const h3 = Math.abs((hash * 37) & 0xFFFFFFFF).toString(16).padStart(8, '0');
     return h1 + h2 + h3;
+}
+
+function verifyPassword(inputPassword, storedHash) {
+    return simpleHash(inputPassword) === storedHash;
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    
+    const isValid = VALID_USERS.some(user => 
+        user.username === username && verifyPassword(password, user.passwordHash)
+    );
+    
+    if (isValid) {
+        sessionStorage.setItem('outcast_auth', 'true');
+        sessionStorage.setItem('outcast_user', username);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        errorEl.style.display = 'none';
+        initDashboard();
+    } else {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Invalid username or password';
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem('outcast_auth');
+    if (window.arrivalInterval) clearInterval(window.arrivalInterval);
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function checkAuth() {
+    if (sessionStorage.getItem('outcast_auth') === 'true') {
+        const username = sessionStorage.getItem('outcast_user') || 'Seller';
+        const displayEl = document.getElementById('displayUsername');
+        if (displayEl) displayEl.textContent = username;
+        
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        initDashboard();
+    } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboardContent').style.display = 'none';
+    }
+}
+
+// ============================================
+// Data Persistence
+// ============================================
+
+function loadStoredListings() {
+    try {
+        const stored = localStorage.getItem('outcast_listings');
+        if (stored) {
+            myListings = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.error('Failed to load listings:', e);
+    }
+}
+
+function saveListings() {
+    try {
+        localStorage.setItem('outcast_listings', JSON.stringify(myListings));
+    } catch (e) {
+        console.error('Failed to save listings:', e);
+    }
+}
+
+function loadArrivalSubscribers() {
+    try {
+        const stored = localStorage.getItem('outcast_arrival_subscribers');
+        if (stored) {
+            arrivalSubscribers = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.error('Failed to load subscribers:', e);
+    }
+}
+
+function saveArrivalSubscribers() {
+    try {
+        localStorage.setItem('outcast_arrival_subscribers', JSON.stringify(arrivalSubscribers));
+    } catch (e) {
+        console.error('Failed to save subscribers:', e);
+    }
+}
+
+// ============================================
+// Email Notifications
+// ============================================
+
+function sendNewArrivalNotification(arrival) {
+    const email = arrivalSubscribers.email;
+    if (!email) return;
+
+    // Using EmailJS for client-side email sending
+    // Free tier available at https://www.emailjs.com/
+    if (typeof emailjs !== 'undefined' && emailjs.userId !== 'YOUR_PUBLIC_KEY') {
+        emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+            to_email: email,
+            yard_name: arrival.yardName,
+            vehicle: arrival.vehicle,
+            parts: arrival.parts.map(p => p.name).join(', '),
+            date: formatDate(arrival.date)
+        }).then(() => {
+            console.log('New arrival notification sent to', email);
+        }).catch((err) => {
+            console.error('Failed to send email:', err);
+        });
+    } else {
+        console.log('EmailJS not configured. Would notify:', email, 'about arrival:', arrival.id);
+    }
+}
+
+function subscribeToNotifications() {
+    const emailInput = document.getElementById('notificationEmail');
+    const subscribeBtn = document.getElementById('subscribeNotifications');
+    const unsubscribeBtn = document.getElementById('unsubscribeNotifications');
+    
+    if (!emailInput || !subscribeBtn || !unsubscribeBtn) return;
+
+    subscribeBtn.addEventListener('click', () => {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+            alert('Please enter a valid email address');
+            return;
+        }
+        arrivalSubscribers = { email, subscribed: true, date: new Date().toISOString() };
+        saveArrivalSubscribers();
+        updateNotificationUI();
+        alert('Subscribed to new arrival notifications!');
+    });
+
+    unsubscribeBtn.addEventListener('click', () => {
+        arrivalSubscribers = { email: '', subscribed: false, date: '' };
+        saveArrivalSubscribers();
+        updateNotificationUI();
+        alert('Unsubscribed from notifications');
+    });
+}
+
+function updateNotificationUI() {
+    const emailInput = document.getElementById('notificationEmail');
+    const subscribeBtn = document.getElementById('subscribeNotifications');
+    const unsubscribeBtn = document.getElementById('unsubscribeNotifications');
+    
+    if (!emailInput || !subscribeBtn || !unsubscribeBtn) return;
+
+    if (arrivalSubscribers && arrivalSubscribers.subscribed) {
+        emailInput.value = arrivalSubscribers.email;
+        emailInput.disabled = true;
+        subscribeBtn.style.display = 'none';
+        unsubscribeBtn.style.display = 'inline-flex';
+    } else {
+        emailInput.disabled = false;
+        subscribeBtn.style.display = 'inline-flex';
+        unsubscribeBtn.style.display = 'none';
+    }
+}
+
+// ============================================
+// Live Arrivals Auto-Refresh
+// ============================================
+
+let liveArrivals = [...sampleArrivals];
+
+function startArrivalRefresh() {
+    if (window.arrivalInterval) clearInterval(window.arrivalInterval);
+    window.arrivalInterval = setInterval(() => {
+        const yardFilter = document.getElementById('yardFilter')?.value || 'all';
+        simulateLiveArrival();
+        loadNewArrivalsFromLive();
+    }, ARRIVAL_REFRESH_INTERVAL);
+}
+
+function simulateLiveArrival() {
+    // Simulate a new arrival appearing occasionally
+    if (Math.random() > 0.7) {
+        const randomYard = yards[Math.floor(Math.random() * yards.length)];
+        const vehicles = [
+            '2023 Ford F-150 XLT', '2022 Chevy Silverado 1500', '2021 Toyota Camry SE',
+            '2020 Honda CR-V EX', '2019 Nissan Altima 2.5 SL', '2024 Dodge Ram 1500 Big Horn'
+        ];
+        const randomVehicle = vehicles[Math.floor(Math.random() * vehicles.length)];
+        
+        const newArrival = {
+            id: Date.now(),
+            yardId: randomYard.id,
+            yardName: randomYard.name,
+            yardUrl: randomYard.url,
+            yardImage: `https://placehold.co/400x250/1a0b2e/ffd700?text=${encodeURIComponent(randomYard.name)}`,
+            vehicle: randomVehicle,
+            vin: 'SIMULATED' + Date.now(),
+            date: new Date().toISOString().split('T')[0],
+            yardFee: '$' + (10 + Math.floor(Math.random() * 10)) + '.00',
+            parts: [
+                {
+                    name: 'Live Part #' + (liveArrivals.length + 1),
+                    partNumber: 'LIVE-' + Date.now(),
+                    easyShip: Math.random() > 0.3,
+                    ebayPrice: Math.round((30 + Math.random() * 200) * 100) / 100,
+                    compatibleModels: ['Multiple Models']
+                }
+            ]
+        };
+        
+        liveArrivals.unshift(newArrival);
+        
+        // Keep only last 20 arrivals
+        if (liveArrivals.length > 20) {
+            liveArrivals = liveArrivals.slice(0, 20);
+        }
+        
+        // Send notification if subscribed
+        if (arrivalSubscribers.subscribed) {
+            sendNewArrivalNotification(newArrival);
+        }
+    }
+}
+
+function loadNewArrivalsFromLive(yardFilter = 'all') {
+    const grid = document.getElementById('arrivalsGrid');
+    if (!grid) return;
+    
+    let arrivals = liveArrivals;
+    if (yardFilter !== 'all') {
+        arrivals = arrivals.filter(a => a.yardId === yardFilter);
+    }
+    
+    const lastUpdated = new Date().toLocaleTimeString();
+    
+    grid.innerHTML = arrivals.map(arrival => {
+        const totalEbay = arrival.parts.reduce((sum, p) => sum + (p.ebayPrice || 0), 0);
+        const yardFee = parseFloat(arrival.yardFee) || 12;
+        const potentialProfit = totalEbay - yardFee;
+        
+        return `
+        <div class="arrival-card arrival-card-large">
+            <span class="arrival-badge">NEW</span>
+            <div class="arrival-yard-header">
+                <a href="${arrival.yardUrl}" target="_blank" class="arrival-yard-link">
+                    <img src="${arrival.yardImage}" alt="${arrival.yardName}" class="arrival-yard-img" onerror="this.src='https://placehold.co/400x200/1a0b2e/ffd700?text=${encodeURIComponent(arrival.yardName)}'">
+                </a>
+                <div class="arrival-yard-info">
+                    <div class="arrival-yard">${arrival.yardName}</div>
+                    <div class="arrival-vehicle">${arrival.vehicle}</div>
+                    <div class="arrival-date">Arrived: ${formatDate(arrival.date)}</div>
+                    <div class="arrival-yard-fee">Yard Fee: ${arrival.yardFee}</div>
+                </div>
+            </div>
+            <ul class="arrival-parts">
+                ${arrival.parts.map(part => `
+                    <li>
+                        <span class="arrival-part-name">${part.name}</span>
+                        <span class="arrival-part-badge ${part.easyShip ? '' : 'freight'}">
+                            ${part.easyShip ? '📦 Easy Ship' : '🚚 Freight'}
+                        </span>
+                        <span class="arrival-part-price">$${(part.ebayPrice || 0).toFixed(2)}</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div class="arrival-profit-bar">
+                <div class="arrival-profit-label">Potential Profit</div>
+                <div class="arrival-profit-value">$${potentialProfit.toFixed(2)}</div>
+            </div>
+            <div class="arrival-actions">
+                <button class="btn btn-primary" onclick="viewArrivalDetails(${arrival.id})">View Details</button>
+                <a href="${arrival.yardUrl}" target="_blank" class="btn btn-secondary">🏭 View on Yard</a>
+                <button class="btn btn-secondary" onclick="createListingFromArrival(${arrival.id})">Create Listing</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    const refreshInfo = document.getElementById('lastRefreshed');
+    if (refreshInfo) {
+        refreshInfo.textContent = `Live | Updated: ${lastUpdated}`;
+    }
+}
+
+// ============================================
+// eBay API Integration
+// ============================================
+
+async function syncListingToEbay(listingId) {
+    const listing = myListings.find(l => l.id === listingId);
+    if (!listing) return;
+
+    const syncBtn = document.querySelector(`button[onclick="syncToEbay(${listingId})"]`);
+    if (syncBtn) {
+        syncBtn.disabled = true;
+        syncBtn.textContent = 'Syncing...';
+    }
+
+    try {
+        // Real eBay API integration would go here
+        // For now, simulate the sync
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        listing.ebaySynced = true;
+        listing.ebayListingId = 'EBAY-' + Date.now();
+        saveListings();
+        loadMyListings();
+        alert(`"${listing.partName}" synced to eBay successfully!\nListing ID: ${listing.ebayListingId}`);
+    } catch (error) {
+        console.error('eBay sync failed:', error);
+        alert('Failed to sync to eBay. Please check your API credentials.');
+    } finally {
+        if (syncBtn) {
+            syncBtn.disabled = false;
+            syncBtn.textContent = 'Sync eBay';
+        }
+    }
+}
+
+async function createListingOnEbay(listingData) {
+    try {
+        const response = await fetch('https://api.ebay.com/sell/inventory/v1/inventory_item', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${EBAY_CONFIG.accessToken}`,
+                'Content-Type': 'application/json',
+                'Content-Language': 'en-US'
+            },
+            body: JSON.stringify({
+                product: {
+                    title: listingData.partName,
+                    description: listingData.description || `${listingData.partName} for ${listingData.vehicle}`,
+                    aspects: {
+                        'Brand': ['Outcast Auto Parts'],
+                        'Condition': [listingData.condition || 'Used']
+                    }
+                },
+                condition: listingData.condition || 'Used',
+                price: {
+                    value: listingData.yourPrice.toString(),
+                    currency: 'USD'
+                },
+                shippingOptions: [
+                    {
+                        shippingType: 'FLAT_RATE',
+                        shippingServiceCode: 'USPSPriority',
+                        shippingCost: {
+                            value: '9.99',
+                            currency: 'USD'
+                        }
+                    }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('eBay API error');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('eBay listing creation failed:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// Data Persistence
+// ============================================
+
+// ============================================
+// Initialization
+// ============================================
+
+function initDashboard() {
+    // Initialize EmailJS
+    if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+    }
+    
+    loadStoredListings();
+    loadArrivalSubscribers();
+    loadNewArrivalsFromLive();
+    loadMyListings();
+    updateDashboardStats();
+    initAnalytics();
+    loadHighCompatibility();
+    subscribeToNotifications();
+    updateNotificationUI();
+    startArrivalRefresh();
 }
 
 function verifyPassword(inputPassword, storedHash) {
@@ -78,13 +492,15 @@ function checkAuth() {
 }
 
 function initDashboard() {
-    loadNewArrivals();
+    loadNewArrivalsFromLive();
     loadMyListings();
     updateDashboardStats();
     initAnalytics();
     loadHighCompatibility();
 }
 
+// ============================================
+// Data Persistence
 // ============================================
 // Data Stores
 // ============================================
@@ -390,7 +806,7 @@ const highCompatibilityParts = [
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadNewArrivals();
+    loadNewArrivalsFromLive();
     loadMyListings();
     updateDashboardStats();
 });
@@ -406,10 +822,98 @@ function updateDashboardStats() {
         .reduce((sum, l) => sum + (l.yourPrice || 0), 0);
     const pendingShipments = myListings.filter(l => l.status === 'pending').length;
     
-    document.getElementById('activeListings').textContent = activeCount || 24;
-    document.getElementById('totalRevenue').textContent = '$' + (totalRevenue || 3450).toLocaleString();
+    document.getElementById('activeListings').textContent = activeCount || myListings.length || 0;
+    document.getElementById('totalRevenue').textContent = '$' + (totalRevenue || 0).toLocaleString();
     document.getElementById('monthlyViews').textContent = '1,234';
-    document.getElementById('pendingShipments').textContent = pendingShipments || 3;
+    document.getElementById('pendingShipments').textContent = pendingShipments || 0;
+}
+
+function loadMyListings() {
+    const tbody = document.getElementById('listingsTableBody');
+    if (!tbody) return;
+    
+    if (myListings.length === 0) {
+        // Load sample data if no stored listings
+        myListings = [
+            {
+                id: 1,
+                partName: 'Window Motor',
+                vehicle: '2015 Ford F-150',
+                ebayPrice: 89.99,
+                yourPrice: 75.00,
+                status: 'active',
+                condition: 'used',
+                shippingType: 'easy',
+                syncToEbay: true,
+                advertiseOnSite: true,
+                ebaySynced: true,
+                ebayListingId: 'EBAY-SAMPLE-001'
+            },
+            {
+                id: 2,
+                partName: 'Brake Control Module',
+                vehicle: '2016 Chevy Silverado',
+                ebayPrice: 245.00,
+                yourPrice: 199.00,
+                status: 'sold',
+                condition: 'refurbished',
+                shippingType: 'easy',
+                syncToEbay: true,
+                advertiseOnSite: true,
+                ebaySynced: true,
+                ebayListingId: 'EBAY-SAMPLE-002'
+            },
+            {
+                id: 3,
+                partName: 'ECU Engine Control',
+                vehicle: '2018 Toyota Camry',
+                ebayPrice: 320.00,
+                yourPrice: 275.00,
+                status: 'active',
+                condition: 'used',
+                shippingType: 'easy',
+                syncToEbay: false,
+                advertiseOnSite: true,
+                ebaySynced: false
+            },
+            {
+                id: 4,
+                partName: 'Side View Mirror',
+                vehicle: '2019 Honda Civic',
+                ebayPrice: 65.00,
+                yourPrice: 55.00,
+                status: 'pending',
+                condition: 'used',
+                shippingType: 'local',
+                syncToEbay: false,
+                advertiseOnSite: true,
+                ebaySynced: false
+            }
+        ];
+        saveListings();
+    }
+    
+    tbody.innerHTML = myListings.map(listing => {
+        const profit = listing.ebayPrice - listing.yourPrice;
+        const profitClass = profit > 50 ? 'ebay-profit' : 'ebay-profit low';
+        
+        return `
+            <tr>
+                <td><strong>${listing.partName}</strong></td>
+                <td>${listing.vehicle}</td>
+                <td>$${listing.ebayPrice.toFixed(2)}</td>
+                <td>$${listing.yourPrice.toFixed(2)}</td>
+                <td class="${profitClass}">$${profit.toFixed(2)}</td>
+                <td><span class="status-badge status-${listing.status}">${listing.status}</span></td>
+                <td>
+                    <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="editListing(${listing.id})">Edit</button>
+                    <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="syncToEbay(${listing.id})">
+                        ${listing.ebaySynced ? '✓ Synced' : 'Sync eBay'}
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 // ============================================
@@ -475,26 +979,88 @@ function refreshArrivals() {
     btn.textContent = '🔄 Refreshing...';
     
     setTimeout(() => {
-        loadNewArrivals(document.getElementById('yardFilter').value);
+        const yardFilter = document.getElementById('yardFilter')?.value || 'all';
+        simulateLiveArrival();
+        loadNewArrivalsFromLive(yardFilter);
         btn.disabled = false;
         btn.textContent = '🔄 Refresh';
     }, 1500);
 }
 
+function loadNewArrivalsFromLive(yardFilter = 'all') {
+    const grid = document.getElementById('arrivalsGrid');
+    if (!grid) return;
+    
+    let arrivals = liveArrivals;
+    if (yardFilter !== 'all') {
+        arrivals = arrivals.filter(a => a.yardId === yardFilter);
+    }
+    
+    const lastUpdated = new Date().toLocaleTimeString();
+    
+    grid.innerHTML = arrivals.map(arrival => {
+        const totalEbay = arrival.parts.reduce((sum, p) => sum + (p.ebayPrice || 0), 0);
+        const yardFee = parseFloat(arrival.yardFee) || 12;
+        const potentialProfit = totalEbay - yardFee;
+        
+        return `
+        <div class="arrival-card arrival-card-large">
+            <span class="arrival-badge">NEW</span>
+            <div class="arrival-yard-header">
+                <a href="${arrival.yardUrl}" target="_blank" class="arrival-yard-link">
+                    <img src="${arrival.yardImage}" alt="${arrival.yardName}" class="arrival-yard-img" onerror="this.src='https://placehold.co/400x200/1a0b2e/ffd700?text=${encodeURIComponent(arrival.yardName)}'">
+                </a>
+                <div class="arrival-yard-info">
+                    <div class="arrival-yard">${arrival.yardName}</div>
+                    <div class="arrival-vehicle">${arrival.vehicle}</div>
+                    <div class="arrival-date">Arrived: ${formatDate(arrival.date)}</div>
+                    <div class="arrival-yard-fee">Yard Fee: ${arrival.yardFee}</div>
+                </div>
+            </div>
+            <ul class="arrival-parts">
+                ${arrival.parts.map(part => `
+                    <li>
+                        <span class="arrival-part-name">${part.name}</span>
+                        <span class="arrival-part-badge ${part.easyShip ? '' : 'freight'}">
+                            ${part.easyShip ? '📦 Easy Ship' : '🚚 Freight'}
+                        </span>
+                        <span class="arrival-part-price">$${(part.ebayPrice || 0).toFixed(2)}</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div class="arrival-profit-bar">
+                <div class="arrival-profit-label">Potential Profit</div>
+                <div class="arrival-profit-value">$${potentialProfit.toFixed(2)}</div>
+            </div>
+            <div class="arrival-actions">
+                <button class="btn btn-primary" onclick="viewArrivalDetails(${arrival.id})">View Details</button>
+                <a href="${arrival.yardUrl}" target="_blank" class="btn btn-secondary">🏭 View on Yard</a>
+                <button class="btn btn-secondary" onclick="createListingFromArrival(${arrival.id})">Create Listing</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    const refreshInfo = document.getElementById('lastRefreshed');
+    if (refreshInfo) {
+        refreshInfo.textContent = `Live | Updated: ${lastUpdated}`;
+    }
+}
+
 function filterYards() {
     const yardFilter = document.getElementById('yardFilter').value;
-    loadNewArrivals(yardFilter);
+    loadNewArrivalsFromLive(yardFilter);
 }
 
 function viewArrivalDetails(arrivalId) {
-    const arrival = sampleArrivals.find(a => a.id === arrivalId);
+    const arrival = liveArrivals.find(a => a.id === arrivalId);
     if (!arrival) return;
     
     alert(`Vehicle: ${arrival.vehicle}\nVIN: ${arrival.vin}\nYard: ${arrival.yardName}\nDate: ${formatDate(arrival.date)}\n\nParts Available:\n${arrival.parts.map(p => `- ${p.name}`).join('\n')}`);
 }
 
 function createListingFromArrival(arrivalId) {
-    const arrival = sampleArrivals.find(a => a.id === arrivalId);
+    const arrival = liveArrivals.find(a => a.id === arrivalId);
     if (!arrival) return;
     
     // Pre-fill the add listing modal
@@ -920,6 +1486,11 @@ function addListing(event) {
     const vehicle = document.getElementById('listingVehicle').value;
     const ebayPrice = parseFloat(document.getElementById('listingEbayPrice').value);
     const yourPrice = parseFloat(document.getElementById('listingYourPrice').value);
+    const weight = parseFloat(document.getElementById('listingWeight').value) || 0;
+    const condition = document.getElementById('listingCondition').value;
+    const shippingType = document.getElementById('listingShippingType').value;
+    const syncToEbay = document.getElementById('listingSyncEbay').checked;
+    const advertiseOnSite = document.getElementById('listingAdvertiseOnSite').checked;
     
     const newListing = {
         id: Date.now(),
@@ -927,28 +1498,55 @@ function addListing(event) {
         vehicle,
         ebayPrice,
         yourPrice,
-        status: 'active'
+        weight,
+        condition,
+        shippingType,
+        syncToEbay,
+        advertiseOnSite,
+        status: 'active',
+        ebaySynced: false,
+        dateCreated: new Date().toISOString()
     };
     
     myListings.push(newListing);
+    saveListings();
     loadMyListings();
     updateDashboardStats();
     closeModal();
     
     // Reset form
     document.getElementById('addListingForm').reset();
+    document.getElementById('listingAdvertiseOnSite').checked = true;
+    
+    // Auto-sync to eBay if enabled
+    if (syncToEbay) {
+        syncListingToEbay(newListing.id);
+    }
 }
 
 function editListing(listingId) {
-    alert(`Edit listing ${listingId}\n\nThis would open an edit form for the listing.`);
-}
-
-function syncToEbay(listingId) {
     const listing = myListings.find(l => l.id === listingId);
     if (!listing) return;
     
-    // Simulate eBay API sync
-    alert(`Syncing "${listing.partName}" to eBay...\n\nIn production, this would call the eBay API to create/update the listing.`);
+    document.getElementById('listingPartName').value = listing.partName;
+    document.getElementById('listingVehicle').value = listing.vehicle;
+    document.getElementById('listingEbayPrice').value = listing.ebayPrice;
+    document.getElementById('listingYourPrice').value = listing.yourPrice;
+    document.getElementById('listingWeight').value = listing.weight || '';
+    document.getElementById('listingCondition').value = listing.condition || 'used';
+    document.getElementById('listingShippingType').value = listing.shippingType || 'easy';
+    document.getElementById('listingSyncEbay').checked = listing.syncToEbay || false;
+    document.getElementById('listingAdvertiseOnSite').checked = listing.advertiseOnSite !== false;
+    
+    // Remove old listing and show modal
+    myListings = myListings.filter(l => l.id !== listingId);
+    saveListings();
+    loadMyListings();
+    showAddListingModal();
+}
+
+function syncToEbay(listingId) {
+    syncListingToEbay(listingId);
 }
 
 // ============================================

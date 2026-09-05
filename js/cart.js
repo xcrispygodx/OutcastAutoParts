@@ -19,7 +19,12 @@ const Cart = {
         if (existing) {
             existing.quantity += 1;
         } else {
-            cart.push({ ...item, quantity: 1 });
+            cart.push({ 
+                ...item, 
+                quantity: 1,
+                shippingType: item.shippingType || 'easy',
+                localDelivery: item.localDelivery || false
+            });
         }
         this.save(cart);
         this.updateBadge();
@@ -52,6 +57,10 @@ const Cart = {
 
     getCount() {
         return this.get().reduce((sum, item) => sum + item.quantity, 0);
+    },
+
+    hasLocalDelivery() {
+        return this.get().some(item => item.localDelivery);
     },
 
     updateBadge() {

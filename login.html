@@ -6,6 +6,7 @@
     <title>Seller Dashboard - Outcast Auto Parts</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 </head>
 <body class="dashboard-body">
     <!-- Login Screen -->
@@ -38,7 +39,7 @@
                 <img src="images/logo.png" alt="Outcast Auto Parts Logo" class="logo-img">
             </a>
             <ul class="nav-links">
-                <li><a href="index.html">Marketplace</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
                 <li><a href="login.html" class="active">Dashboard</a></li>
                 <li><a href="#new-arrivals">New Arrivals</a></li>
                 <li><a href="#ebay-search">eBay Search</a></li>
@@ -111,7 +112,7 @@
             <div class="section-header">
                 <div>
                     <h2>🎯 Scavenger Hunt - Yard Arrivals</h2>
-                    <p>Find high-dollar parts at local self-serve yards. Buy cheap, sell fast on eBay.</p>
+                    <p>Find high-dollar parts at local self-serve yards. Buy cheap, sell fast on eBay. <span id="lastRefreshed" style="font-size: 0.85rem; color: var(--text-dim);"></span></p>
                 </div>
                 <div class="section-actions">
                     <select id="yardFilter" class="filter-select" onchange="filterYards()">
@@ -146,6 +147,17 @@
 
             <div class="arrivals-grid arrivals-grid-large" id="arrivalsGrid">
                 <!-- Populated by JS -->
+            </div>
+            
+            <!-- Email Notification Subscription -->
+            <div class="notification-subscribe" style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-orange); border-radius: 8px; text-align: center;">
+                <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">📧 New Arrival Alerts</h4>
+                <p style="color: var(--text-dim); margin-bottom: 1rem; font-size: 0.9rem;">Get notified when high-dollar parts arrive at your local yards</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; align-items: center;">
+                    <input type="email" id="notificationEmail" placeholder="your@email.com" style="padding: 0.75rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-dark); color: var(--text); font-family: var(--font-body); min-width: 250px;">
+                    <button class="btn btn-primary" id="subscribeNotifications">Subscribe</button>
+                    <button class="btn btn-secondary" id="unsubscribeNotifications" style="display: none;">Unsubscribe</button>
+                </div>
             </div>
         </div>
     </section>
@@ -341,6 +353,24 @@
                             <option value="refurbished">Refurbished</option>
                             <option value="new">New</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Shipping Type</label>
+                        <select id="listingShippingType">
+                            <option value="easy">Easy Ship (Parcel)</option>
+                            <option value="freight">Freight (Heavy)</option>
+                            <option value="local">Local Delivery Only</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="listingSyncEbay"> Sync to eBay automatically
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="listingAdvertiseOnSite" checked> Advertise on Outcast Auto Parts
+                        </label>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>

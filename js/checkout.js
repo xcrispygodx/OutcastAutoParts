@@ -4,11 +4,14 @@
 // Configuration
 // ============================================
 
-// Replace with your Stripe publishable key (pk_test_... or pk_live_...)
 const STRIPE_PUBLISHABLE_KEY = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY';
-
-// Backend endpoint to create PaymentIntent
 const CREATE_PAYMENT_INTENT_URL = '/api/create-payment-intent';
+
+const SHIPPING_RATES = {
+    standard: 9.99,
+    express: 19.99,
+    local: 0
+};
 
 // ============================================
 // State
@@ -17,6 +20,7 @@ const CREATE_PAYMENT_INTENT_URL = '/api/create-payment-intent';
 let stripe = null;
 let elements = null;
 let cardElement = null;
+let selectedShipping = 'standard';
 
 // ============================================
 // Initialization
@@ -78,6 +82,29 @@ function initStripe() {
 }
 
 // ============================================
+// Shipping Method
+// ============================================
+
+function updateShippingMethod() {
+    const selected = document.querySelector('input[name="shippingMethod"]:checked');
+    if (!selected) return;
+    
+    selectedShipping = selected.value;
+    const standardFields = document.getElementById('standardShippingFields');
+    const localFields = document.getElementById('localDeliveryFields');
+    
+    if (selectedShipping === 'local') {
+        standardFields.style.display = 'none';
+        localFields.classList.add('active');
+    } else {
+        standardFields.style.display = 'block';
+        localFields.classList.remove('active');
+    }
+    
+    updateOrderSummary();
+}
+
+// ============================================
 // Cart Rendering
 // ============================================
 
@@ -88,7 +115,7 @@ function renderCart() {
     const cart = Cart.get();
 
     if (cart.length === 0) {
-        container.innerHTML = '<p class="empty-cart">Your cart is empty. <a href="index.html">Browse parts</a></p>';
+        container.innerHTML = '<p class="empty-cart">Your cart is empty. <a href="marketplace.html">Browse parts</a></p>';
         return;
     }
 
@@ -98,6 +125,7 @@ function renderCart() {
                 <div class="cart-item-name">${item.name}</div>
                 <div class="cart-item-vehicle">${item.vehicle || ''}</div>
                 <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                ${item.shippingType === 'local' ? '<span class="part-card-local-badge" style="margin-top: 0.5rem;">Local Delivery</span>' : ''}
             </div>
             <div class="cart-item-controls">
                 <div class="quantity-controls">
@@ -120,7 +148,7 @@ function updateOrderSummary() {
     const retailTotal = cart.reduce((sum, item) => sum + ((item.retailPrice || item.price * 2) * item.quantity), 0);
     const savings = retailTotal - subtotal;
     const savingsPercent = retailTotal > 0 ? Math.round((savings / retailTotal) * 100) : 0;
-    const shipping = subtotal > 100 ? 0 : 9.99;
+    const shipping = SHIPPING_RATES[selectedShipping] || (subtotal > 100 ? 0 : 9.99);
     const total = subtotal + shipping;
 
     document.getElementById('summarySubtotal').textContent = '$' + subtotal.toFixed(2);
@@ -155,22 +183,40 @@ async function handlePayment() {
 
     // Validate shipping form
     const shippingForm = document.getElementById('shippingForm');
-    if (!shippingForm.checkValidity()) {
-        shippingForm.reportValidity();
-        return;
+    
+    // For local delivery, only validate required fields
+    if (selectedShipping === 'local') {
+        const name = document.getElementById('shippingName').value.trim();
+        const email = document.getElementById('shippingEmail').value.trim();
+        if (!name || !email) {
+            alert('Please fill in your name and email for local delivery.');
+            return;
+        }
+    } else {
+        if (!shippingForm.checkValidity()) {
+            shippingForm.reportValidity();
+            return;
+        }
     }
 
     // Collect shipping info
     const shippingInfo = {
         name: document.getElementById('shippingName').value,
         email: document.getElementById('shippingEmail').value,
-        address: {
+        address: selectedShipping === 'local' ? {
+            line1: document.getElementById('localDeliveryAddress').value || 'Local Pickup',
+            city: '',
+            state: '',
+            postal_code: ''
+        } : {
             line1: document.getElementById('shippingAddress').value,
             city: document.getElementById('shippingCity').value,
             state: document.getElementById('shippingState').value,
             postal_code: document.getElementById('shippingZip').value
         },
-        phone: document.getElementById('shippingPhone').value
+        phone: document.getElementById('shippingPhone').value,
+        method: selectedShipping,
+        notes: document.getElementById('localDeliveryNotes').value || ''
     };
 
     // Show loading state
@@ -179,7 +225,8 @@ async function handlePayment() {
     buttonSpinner.style.display = 'inline-block';
 
     try {
-        // Create PaymentIntent on backend
+        const shippingCost = SHIPPING_RATES[selectedShipping] || (subtotal > 100 ? 0 : 9.99);
+        
         const response = await fetch(CREATE_PAYMENT_INTENT_URL, {
             method: 'POST',
             headers: {
@@ -188,7 +235,7 @@ async function handlePayment() {
             body: JSON.stringify({
                 items: cart,
                 shipping: shippingInfo,
-                shippingCost: Cart.get().reduce((sum, item) => sum + (item.price * item.quantity), 0) > 100 ? 0 : 9.99
+                shippingCost: shippingCost
             })
         });
 
@@ -198,7 +245,6 @@ async function handlePayment() {
 
         const { clientSecret } = await response.json();
 
-        // Confirm payment with Stripe
         const result = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
                 billing_details: {
@@ -216,7 +262,6 @@ async function handlePayment() {
             buttonText.textContent = 'Place Order';
             buttonSpinner.style.display = 'none';
         } else {
-            // Payment succeeded
             Cart.clear();
             renderCart();
             updateOrderSummary();
@@ -239,7 +284,7 @@ function showSuccess(paymentId) {
             <h2>Order Confirmed!</h2>
             <p>Thank you for your purchase. Your order ID is: <strong>${paymentId}</strong></p>
             <p>A confirmation email will be sent shortly.</p>
-            <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+            <a href="marketplace.html" class="btn btn-primary">Continue Shopping</a>
         </div>
     `;
 }

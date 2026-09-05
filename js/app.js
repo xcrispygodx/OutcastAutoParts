@@ -13,7 +13,9 @@ const sampleParts = [
         retailPrice: 349.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
-        weight: 3.2
+        weight: 3.2,
+        shippingType: "easy",
+        localDelivery: true
     },
     {
         id: 2,
@@ -25,8 +27,10 @@ const sampleParts = [
         price: 245.00,
         retailPrice: 899.99,
         condition: "Refurbished",
-        shipping: "Ships within 24hrs",
-        weight: 5.8
+        shipping: "Freight Only",
+        weight: 5.8,
+        shippingType: "freight",
+        localDelivery: false
     },
     {
         id: 3,
@@ -39,7 +43,9 @@ const sampleParts = [
         retailPrice: 1299.99,
         condition: "Used",
         shipping: "Freight Only",
-        weight: 2.1
+        weight: 2.1,
+        shippingType: "freight",
+        localDelivery: false
     },
     {
         id: 4,
@@ -52,7 +58,9 @@ const sampleParts = [
         retailPrice: 279.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
-        weight: 1.5
+        weight: 1.5,
+        shippingType: "easy",
+        localDelivery: true
     },
     {
         id: 5,
@@ -65,7 +73,9 @@ const sampleParts = [
         retailPrice: 189.99,
         condition: "Used",
         shipping: "Ships within 24hrs",
-        weight: 0.8
+        weight: 0.8,
+        shippingType: "easy",
+        localDelivery: true
     },
     {
         id: 6,
@@ -78,7 +88,9 @@ const sampleParts = [
         retailPrice: 749.99,
         condition: "Refurbished",
         shipping: "Ships within 24hrs",
-        weight: 4.2
+        weight: 4.2,
+        shippingType: "easy",
+        localDelivery: true
     }
 ];
 
@@ -93,11 +105,15 @@ function addToCart(partId) {
         vehicle: `${part.year} ${part.make} ${part.model}`,
         price: part.price,
         retailPrice: part.retailPrice,
-        quantity: 1
+        quantity: 1,
+        shippingType: part.shippingType,
+        localDelivery: part.localDelivery
     };
     
     Cart.add(item);
 }
+
+// Cart functions exposed globally
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
@@ -134,6 +150,7 @@ function loadFeaturedParts() {
                 <span class="part-card-shipping">${part.shipping === 'Freight Only' ? '🚚' : '📦'} ${part.shipping}</span>
                 <span>${part.weight} lbs</span>
             </div>
+            ${part.localDelivery ? '<span class="part-card-local-badge">🚚 Local Delivery Available</span>' : ''}
             <button class="btn btn-primary order-direct-btn" onclick="addToCart(${part.id})">
                 Order Direct - $${part.price.toFixed(2)}
             </button>

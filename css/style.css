@@ -2075,17 +2075,195 @@ body {
     font-size: 0.9rem;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-    .checkout-grid {
-        grid-template-columns: 1fr;
-    }
+/* Notification Subscribe */
+.notification-subscribe {
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+}
 
-    .checkout-sidebar {
-        position: static;
-    }
+.notification-subscribe input {
+    flex: 1;
+}
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+/* Local Delivery Option */
+.local-delivery-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 107, 0, 0.05);
+    border: 1px solid var(--border-orange);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.local-delivery-option:hover {
+    border-color: var(--primary);
+    background: rgba(255, 107, 0, 0.08);
+}
+
+.local-delivery-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+}
+
+.local-delivery-info {
+    flex: 1;
+}
+
+.local-delivery-info strong {
+    display: block;
+    color: var(--primary);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.local-delivery-info span {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.local-delivery-details {
+    display: none;
+    padding: 1rem;
+    background: rgba(255, 107, 0, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.local-delivery-details.active {
+    display: block;
+}
+
+/* Checkout Shipping Selection */
+.shipping-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 107, 0, 0.05);
+    border: 1px solid var(--border-orange);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.shipping-option:hover {
+    border-color: var(--primary);
+}
+
+.shipping-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+}
+
+.shipping-option-info {
+    flex: 1;
+}
+
+.shipping-option-info strong {
+    display: block;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.shipping-option-info span {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.shipping-option-price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Part Card Local Delivery Badge */
+.part-card-local-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(22, 163, 74, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(22, 163, 74, 0.3);
+    margin-top: 0.5rem;
+}
+
+/* Landing Page */
+.landing-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: 
+        radial-gradient(ellipse at top, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom, rgba(255, 183, 0, 0.05) 0%, transparent 50%),
+        var(--bg-dark);
+    padding: 2rem;
+}
+
+.landing-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-orange);
+    border-radius: 16px;
+    padding: 4rem 3rem;
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 
+        0 0 40px rgba(255, 107, 0, 0.15),
+        var(--shadow);
+}
+
+.landing-logo {
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 16px var(--accent-glow));
+}
+
+.landing-card h1 {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.landing-subtitle {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+}
+
+.landing-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.landing-note {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    opacity: 0.8;
 }

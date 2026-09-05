@@ -15,7 +15,7 @@
                 <img src="images/logo.png" alt="Outcast Auto Parts Logo" class="logo-img">
             </a>
             <ul class="nav-links">
-                <li><a href="index.html">Marketplace</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
                 <li><a href="login.html">Seller Dashboard</a></li>
                 <li><a href="checkout.html" class="active">Checkout</a></li>
             </ul>
@@ -54,24 +54,71 @@
                                     <input type="email" id="shippingEmail" required placeholder="john@example.com">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="shippingAddress">Address</label>
-                                <input type="text" id="shippingAddress" required placeholder="123 Main St">
+                            
+                            <div class="shipping-options">
+                                <label class="shipping-option">
+                                    <input type="radio" name="shippingMethod" value="standard" checked onchange="updateShippingMethod()">
+                                    <div class="shipping-option-info">
+                                        <strong>Standard Shipping</strong>
+                                        <span>3-5 business days via USPS/FedEx</span>
+                                    </div>
+                                    <div class="shipping-option-price" id="standardShippingPrice">$9.99</div>
+                                </label>
+                                
+                                <label class="shipping-option">
+                                    <input type="radio" name="shippingMethod" value="express" onchange="updateShippingMethod()">
+                                    <div class="shipping-option-info">
+                                        <strong>Express Shipping</strong>
+                                        <span>1-2 business days via FedEx</span>
+                                    </div>
+                                    <div class="shipping-option-price">$19.99</div>
+                                </label>
+                                
+                                <label class="shipping-option">
+                                    <input type="radio" name="shippingMethod" value="local" onchange="updateShippingMethod()">
+                                    <div class="shipping-option-info">
+                                        <strong>Local Delivery / Pickup</strong>
+                                        <span>Same-day delivery within 25 miles or yard pickup</span>
+                                    </div>
+                                    <div class="shipping-option-price">FREE</div>
+                                </label>
                             </div>
-                            <div class="form-row">
+
+                            <div id="standardShippingFields">
                                 <div class="form-group">
-                                    <label for="shippingCity">City</label>
-                                    <input type="text" id="shippingCity" required placeholder="Hometown">
+                                    <label for="shippingAddress">Address</label>
+                                    <input type="text" id="shippingAddress" required placeholder="123 Main St">
                                 </div>
-                                <div class="form-group">
-                                    <label for="shippingState">State</label>
-                                    <input type="text" id="shippingState" required placeholder="TX">
-                                </div>
-                                <div class="form-group">
-                                    <label for="shippingZip">ZIP</label>
-                                    <input type="text" id="shippingZip" required placeholder="75001">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="shippingCity">City</label>
+                                        <input type="text" id="shippingCity" required placeholder="Hometown">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shippingState">State</label>
+                                        <input type="text" id="shippingState" required placeholder="TX">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shippingZip">ZIP</label>
+                                        <input type="text" id="shippingZip" required placeholder="75001">
+                                    </div>
                                 </div>
                             </div>
+
+                            <div id="localDeliveryFields" class="local-delivery-details">
+                                <div class="form-group">
+                                    <label for="localDeliveryAddress">Delivery Address (if different from pickup location)</label>
+                                    <input type="text" id="localDeliveryAddress" placeholder="Leave blank for yard pickup">
+                                </div>
+                                <div class="form-group">
+                                    <label for="localDeliveryNotes">Delivery Notes</label>
+                                    <input type="text" id="localDeliveryNotes" placeholder="Gate code, preferred time, etc.">
+                                </div>
+                                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">
+                                    🚚 Local delivery available within 25 miles of our yard. Same-day delivery for orders placed before 2 PM.
+                                </p>
+                            </div>
+
                             <div class="form-group">
                                 <label for="shippingPhone">Phone</label>
                                 <input type="tel" id="shippingPhone" placeholder="(555) 123-4567">
