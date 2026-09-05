@@ -103,6 +103,27 @@ To enable real eBay integration:
     }
     ```
 
+### User Authentication & Accounts (Cloudflare Workers)
+
+Customer and seller accounts are secured with a Cloudflare Worker + KV backend:
+
+1. Install Wrangler: `npm install -g wrangler`
+2. Create KV namespace: `wrangler kv namespace create AUTH`
+3. Copy the KV namespace ID into `wrangler.toml`
+4. Update the worker URL in `js/auth.js`:
+    ```javascript
+    baseUrl: 'https://outcast-auto-parts-auth.your-subdomain.workers.dev'
+    ```
+5. Deploy the worker: `wrangler deploy`
+6. The site now supports secure registration, login, logout, and session verification
+
+**Security features:**
+- Passwords hashed with PBKDF2 + SHA-256 (100k iterations)
+- Per-user salts
+- 7-day session tokens
+- CORS-enabled API
+- Cloudflare rate limiting and DDoS protection
+
 ## Future Enhancements
 
 - [x] Stripe checkout integration
@@ -112,7 +133,7 @@ To enable real eBay integration:
 - [x] eBay sync from listings
 - [x] Live arrivals with email notifications
 - [x] Local delivery checkout option
-- [ ] User authentication & accounts
+- [x] User authentication & accounts
 - [ ] Real eBay API integration
 - [ ] Shipping label generation
 - [ ] Freight shipping module

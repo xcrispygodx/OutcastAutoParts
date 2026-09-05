@@ -24,71 +24,118 @@ const ARRIVAL_REFRESH_INTERVAL = 30000; // 30 seconds
 // Authentication
 // ============================================
 
-const VALID_USERS = [
-    { username: 'OutcastAutoParts210', passwordHash: '40e995c523b6dd2561c2a579' },
-    { username: 'JesusAngel', passwordHash: '0a18abb138fcca6f7590d095' }
-];
-
-function simpleHash(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
-    const h1 = Math.abs(hash).toString(16).padStart(8, '0');
-    const h2 = Math.abs((hash * 31) & 0xFFFFFFFF).toString(16).padStart(8, '0');
-    const h3 = Math.abs((hash * 37) & 0xFFFFFFFF).toString(16).padStart(8, '0');
-    return h1 + h2 + h3;
-}
-
-function verifyPassword(inputPassword, storedHash) {
-    return simpleHash(inputPassword) === storedHash;
-}
-
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     const errorEl = document.getElementById('loginError');
     
-    const isValid = VALID_USERS.some(user => 
-        user.username === username && verifyPassword(password, user.passwordHash)
-    );
+    errorEl.style.display = 'none';
     
-    if (isValid) {
-        sessionStorage.setItem('outcast_auth', 'true');
-        sessionStorage.setItem('outcast_user', username);
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        errorEl.style.display = 'none';
-        initDashboard();
-    } else {
+    try {
+        const result = await AuthAPI.login(username, password);
+        if (result.success) {
+            AuthAPI.setToken(result.token);
+            const displayEl = document.getElementById('displayUsername');
+            if (displayEl) displayEl.textContent = result.user.username;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            initDashboard();
+        } else {
+            errorEl.style.display = 'block';
+            errorEl.textContent = result.error || 'Invalid username or password';
+        }
+    } catch (error) {
         errorEl.style.display = 'block';
-        errorEl.textContent = 'Invalid username or password';
+        errorEl.textContent = 'Login failed. Please try again.';
     }
 }
 
-function logout() {
-    sessionStorage.removeItem('outcast_auth');
-    if (window.arrivalInterval) clearInterval(window.arrivalInterval);
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('dashboardContent').style.display = 'none';
-    document.getElementById('loginForm').reset();
-    document.getElementById('loginError').style.display = 'none';
+async function handleRegister(event) {
+    event.preventDefault();
+    const username = document.getElementById('regUsername').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const accountType = document.getElementById('regAccountType').value;
+    const errorEl = document.getElementById('registerError');
+    
+    errorEl.style.display = 'none';
+    
+    try {
+        const result = await AuthAPI.register(username, email, password, accountType);
+        if (result.success) {
+            AuthAPI.setToken(result.token);
+            const displayEl = document.getElementById('displayUsername');
+            if (displayEl) displayEl.textContent = result.user.username;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            initDashboard();
+        } else {
+            errorEl.style.display = 'block';
+            errorEl.textContent = result.error || 'Registration failed';
+        }
+    } catch (error) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Registration failed. Please try again.';
+    }
 }
 
-function checkAuth() {
-    if (sessionStorage.getItem('outcast_auth') === 'true') {
-        const username = sessionStorage.getItem('outcast_user') || 'Seller';
-        const displayEl = document.getElementById('displayUsername');
-        if (displayEl) displayEl.textContent = username;
-        
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        initDashboard();
-    } else {
-        document.getElementById('loginScreen').style.display = 'flex';
+function showRegister(event) {
+    event.preventDefault();
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('authTitle').textContent = 'Create Account';
+    document.getElementById('authSubtitle').textContent = 'Join Outcast Auto Parts';
+}
+
+function showLogin(event) {
+    event.preventDefault();
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('authTitle').textContent = 'Welcome Back';
+    document.getElementById('authSubtitle').textContent = 'Sign in to your account';
+}
+
+async function logout() {
+    const token = AuthAPI.getToken();
+    if (token) {
+        await AuthAPI.logout(token);
+    }
+    AuthAPI.removeToken();
+    if (window.arrivalInterval) clearInterval(window.arrivalInterval);
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('registerForm').reset();
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('registerError').style.display = 'none';
+    showLogin(new Event('click'));
+}
+
+async function checkAuth() {
+    const token = AuthAPI.getToken();
+    if (!token) {
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('dashboardContent').style.display = 'none';
+        return;
+    }
+    
+    try {
+        const result = await AuthAPI.verify(token);
+        if (result.success) {
+            const displayEl = document.getElementById('displayUsername');
+            if (displayEl) displayEl.textContent = result.user.username;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            initDashboard();
+        } else {
+            AuthAPI.removeToken();
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('dashboardContent').style.display = 'none';
+        }
+    } catch (error) {
+        AuthAPI.removeToken();
+        document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('dashboardContent').style.display = 'none';
     }
 }
@@ -478,69 +525,6 @@ function initDashboard() {
     subscribeToNotifications();
     updateNotificationUI();
     startArrivalRefresh();
-}
-
-function verifyPassword(inputPassword, storedHash) {
-    return simpleHash(inputPassword) === storedHash;
-}
-
-function handleLogin(event) {
-    event.preventDefault();
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-    const errorEl = document.getElementById('loginError');
-    
-    console.log('Login attempt:', username);
-    console.log('Password hash:', simpleHash(password));
-    
-    const isValid = VALID_USERS.some(user => 
-        user.username === username && verifyPassword(password, user.passwordHash)
-    );
-    
-    console.log('Login valid:', isValid);
-    
-    if (isValid) {
-        sessionStorage.setItem('outcast_auth', 'true');
-        sessionStorage.setItem('outcast_user', username);
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        errorEl.style.display = 'none';
-        initDashboard();
-    } else {
-        errorEl.style.display = 'block';
-        errorEl.textContent = 'Invalid username or password';
-    }
-}
-
-function logout() {
-    sessionStorage.removeItem('outcast_auth');
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('dashboardContent').style.display = 'none';
-    document.getElementById('loginForm').reset();
-    document.getElementById('loginError').style.display = 'none';
-}
-
-function checkAuth() {
-    if (sessionStorage.getItem('outcast_auth') === 'true') {
-        const username = sessionStorage.getItem('outcast_user') || 'Seller';
-        const displayEl = document.getElementById('displayUsername');
-        if (displayEl) displayEl.textContent = username;
-        
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        initDashboard();
-    } else {
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('dashboardContent').style.display = 'none';
-    }
-}
-
-function initDashboard() {
-    loadNewArrivalsFromLive();
-    loadMyListings();
-    updateDashboardStats();
-    initAnalytics();
-    loadHighCompatibility();
 }
 
 // ============================================
