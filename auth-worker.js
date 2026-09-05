@@ -4,14 +4,21 @@
 // Deploy with: wrangler deploy
 // Setup KV: wrangler kv namespace create AUTH
 
-const AUTH_KV = AUTH;
-
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400'
 };
+
+const AUTH_KV = typeof AUTH !== 'undefined' ? AUTH : undefined;
+
+function kvNotConfiguredResponse() {
+  return new Response(JSON.stringify({ error: 'KV namespace not configured. Run: wrangler kv namespace create AUTH' }), {
+    status: 500,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+  });
+}
 
 async function hashPassword(password, salt) {
   const encoder = new TextEncoder();
@@ -62,6 +69,7 @@ function errorResponse(message, status = 400) {
 }
 
 async function handleRegister(request) {
+  if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const { username, email, password, accountType } = await request.json();
     
@@ -118,6 +126,7 @@ async function handleRegister(request) {
 }
 
 async function handleLogin(request) {
+  if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const { username, password } = await request.json();
     
@@ -157,6 +166,7 @@ async function handleLogin(request) {
 }
 
 async function handleVerify(request) {
+  if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -195,6 +205,7 @@ async function handleVerify(request) {
 }
 
 async function handleLogout(request) {
+  if (!AUTH_KV) return kvNotConfiguredResponse();
   try {
     const authHeader = request.headers.get('Authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -230,75 +241,12 @@ async function handleRequest(request) {
   if (path === '/auth/logout' && request.method === 'POST') {
     return handleLogout(request);
   }
-
+  
   if (path === '/yard-images' && request.method === 'GET') {
     return handleYardImages(request);
   }
   
   return errorResponse('Not found', 404);
-}
-
-async function handleYardImages(request) {
-  try {
-    const url = new URL(request.url);
-    const targetUrl = url.searchParams.get('url');
-    
-    if (!targetUrl) {
-      return errorResponse('URL parameter required', 400);
-    }
-    
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; OutcastAutoParts/1.0)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
-      }
-    });
-    
-    if (!response.ok) {
-      return errorResponse('Failed to fetch yard page', 400);
-    }
-    
-    const html = await response.text();
-    const imageUrls = [];
-    
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let match;
-    while ((match = imgRegex.exec(html)) !== null) {
-      let src = match[1];
-      if (src && !src.startsWith('data:')) {
-        if (src.startsWith('//')) {
-          src = 'https:' + src;
-        } else if (src.startsWith('/')) {
-          const baseUrl = new URL(targetUrl);
-          src = baseUrl.origin + src;
-        } else if (!src.startsWith('http')) {
-          const baseUrl = new URL(targetUrl);
-          src = baseUrl.origin + '/' + src;
-        }
-        if (!imageUrls.includes(src)) {
-          imageUrls.push(src);
-        }
-      }
-    }
-    
-    const ogImageRegex = /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["'][^>]*>/i;
-    const ogMatch = html.match(ogImageRegex);
-    if (ogMatch && ogMatch[1]) {
-      imageUrls.unshift(ogMatch[1]);
-    }
-    
-    const sortedImages = imageUrls.slice(0, 20);
-    
-    return new Response(JSON.stringify({ images: sortedImages }), {
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600'
-      }
-    });
-  } catch (error) {
-    return errorResponse('Failed to fetch images: ' + error.message, 500);
-  }
 }
 
 export default handleRequest;

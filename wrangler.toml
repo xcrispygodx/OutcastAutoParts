@@ -1,7 +1,3 @@
 name = "outcast-auto-parts-auth"
 main = "auth-worker.js"
 compatibility_date = "2024-01-01"
-
-[[kv_namespaces]]
-binding = "AUTH"
-id = "outcast_auth_kv"
