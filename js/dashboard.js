@@ -18,10 +18,23 @@ const EBAY_CONFIG = {
     sandbox: true
 };
 
-const ARRIVAL_REFRESH_INTERVAL = 30000; // 30 seconds
+const ARRIVAL_REFRESH_INTERVAL = 60000; // 60 seconds
 const YARD_IMAGE_API = 'https://outcast-auto-parts-auth.outcast-auto-parts.workers.dev/yard-images';
 const YARD_IMAGE_CACHE_TTL = 3600000;
 const yardImageCache = new Map();
+
+const YARD_IMAGES = {
+    'https://wrenchapart.com': [
+        'https://wrenchapart.com/images/wrench-a-part.png',
+        'https://wrenchapart.com/images/Website-Banner.avif'
+    ],
+    'https://rooseveltupullit.com': [
+        'https://placehold.co/600x400/1a0b2e/ffd700?text=Roosevelt+U-Pull-It'
+    ],
+    'https://xcrispygodx.github.io/BIGDONGPARTS/': [
+        'https://placehold.co/600x400/1a0b2e/ffd700?text=AutoAlchemy+Yard'
+    ]
+};
 
 // ============================================
 // Authentication
@@ -154,17 +167,26 @@ async function fetchYardImages(yardUrl) {
         return cached.images;
     }
 
+    const directImages = YARD_IMAGES[yardUrl];
+    if (directImages && directImages.length > 0) {
+        yardImageCache.set(cacheKey, { images: directImages, timestamp: Date.now() });
+        return directImages;
+    }
+
     try {
         const response = await fetch(`${YARD_IMAGE_API}?url=${encodeURIComponent(yardUrl)}`);
         if (!response.ok) throw new Error('Failed to fetch yard images');
         const data = await response.json();
         const images = data.images || [];
-        yardImageCache.set(cacheKey, { images, timestamp: Date.now() });
-        return images;
+        if (images.length > 0) {
+            yardImageCache.set(cacheKey, { images, timestamp: Date.now() });
+            return images;
+        }
     } catch (error) {
         console.error('Error fetching yard images:', error);
-        return [];
     }
+    
+    return [`https://placehold.co/600x400/1a0b2e/ffd700?text=${encodeURIComponent(yardUrl)}`];
 }
 
 async function updateYardPreviewImages() {
@@ -350,7 +372,7 @@ function startArrivalRefresh() {
 }
 
 function autoUpdateArrivalsOnLoad() {
-    const targetCount = Math.max(liveArrivals.length, 9);
+    const targetCount = Math.max(liveArrivals.length, 12);
     while (liveArrivals.length < targetCount) {
         const randomYard = yards[Math.floor(Math.random() * yards.length)];
         const vehicles = [
@@ -445,7 +467,7 @@ function loadNewArrivalsFromLive(yardFilter = 'all') {
     }
     
     const lastUpdated = new Date().toLocaleTimeString();
-    const displayArrivals = arrivals.slice(0, 9);
+    const displayArrivals = arrivals.slice(0, 12);
     
     grid.innerHTML = displayArrivals.map(arrival => {
         const totalEbay = arrival.parts.reduce((sum, p) => sum + (p.ebayPrice || 0), 0);

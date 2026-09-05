@@ -1080,23 +1080,6 @@ body {
     border-radius: 8px;
     border: 1px solid var(--border-orange);
     background: var(--bg-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-dim);
-    font-size: 0.85rem;
-}
-
-.yard-preview-loading {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-}
-
-.yard-preview-real {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 180px;
 }
 
 .yard-link-card {
