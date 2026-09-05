@@ -223,6 +223,49 @@ function startArrivalRefresh() {
     }, ARRIVAL_REFRESH_INTERVAL);
 }
 
+function autoUpdateArrivalsOnLoad() {
+    // Add 3-5 new vehicles automatically on page load
+    const newCount = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < newCount; i++) {
+        const randomYard = yards[Math.floor(Math.random() * yards.length)];
+        const vehicles = [
+            '2023 Ford F-150 XLT', '2022 Chevy Silverado 1500', '2021 Toyota Camry SE',
+            '2020 Honda CR-V EX', '2019 Nissan Altima 2.5 SL', '2024 Dodge Ram 1500 Big Horn',
+            '2023 Jeep Grand Cherokee', '2022 Ram 1500', '2021 GMC Sierra 1500',
+            '2020 Ford Explorer', '2019 Toyota RAV4', '2024 Chevrolet Equinox'
+        ];
+        const randomVehicle = vehicles[Math.floor(Math.random() * vehicles.length)];
+        
+        const newArrival = {
+            id: Date.now() + i,
+            yardId: randomYard.id,
+            yardName: randomYard.name,
+            yardUrl: randomYard.url,
+            yardImage: `https://placehold.co/400x250/1a0b2e/ffd700?text=${encodeURIComponent(randomYard.name)}`,
+            vehicle: randomVehicle,
+            vin: 'AUTO-' + Date.now() + '-' + i,
+            date: new Date().toISOString().split('T')[0],
+            yardFee: '$' + (10 + Math.floor(Math.random() * 10)) + '.00',
+            parts: [
+                {
+                    name: 'New Arrival Part #' + (liveArrivals.length + 1 + i),
+                    partNumber: 'NEW-' + Date.now() + '-' + i,
+                    easyShip: Math.random() > 0.3,
+                    ebayPrice: Math.round((30 + Math.random() * 200) * 100) / 100,
+                    compatibleModels: ['Multiple Models']
+                }
+            ]
+        };
+        
+        liveArrivals.unshift(newArrival);
+    }
+    
+    // Keep only last 30 arrivals
+    if (liveArrivals.length > 30) {
+        liveArrivals = liveArrivals.slice(0, 30);
+    }
+}
+
 function simulateLiveArrival() {
     // Simulate a new arrival appearing occasionally
     if (Math.random() > 0.7) {
@@ -426,6 +469,7 @@ function initDashboard() {
     
     loadStoredListings();
     loadArrivalSubscribers();
+    autoUpdateArrivalsOnLoad();
     loadNewArrivalsFromLive();
     loadMyListings();
     updateDashboardStats();

@@ -82,6 +82,37 @@
                                     </div>
                                     <div class="shipping-option-price">FREE</div>
                                 </label>
+
+                                <label class="shipping-option">
+                                    <input type="radio" name="shippingMethod" value="freight" onchange="updateShippingMethod()">
+                                    <div class="shipping-option-info">
+                                        <strong>Freight Shipping</strong>
+                                        <span>Heavy items: engines, transmissions, large components</span>
+                                    </div>
+                                    <div class="shipping-option-price" id="freightShippingPrice">Calculate</div>
+                                </label>
+                            </div>
+
+                            <div id="freightCalculator" class="local-delivery-details">
+                                <div class="form-group">
+                                    <label for="freightOriginZip">Origin ZIP</label>
+                                    <input type="text" id="freightOriginZip" value="78223" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="freightDestZip">Destination ZIP</label>
+                                    <input type="text" id="freightDestZip" placeholder="Enter ZIP code" oninput="calculateFreight()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Estimated Distance</label>
+                                    <input type="text" id="freightDistance" readonly placeholder="Enter destination ZIP">
+                                </div>
+                                <div class="form-group">
+                                    <label>Freight Rate</label>
+                                    <input type="text" id="freightRate" readonly placeholder="$40 base + $2/mile after 20 miles">
+                                </div>
+                                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">
+                                    🚚 Freight rates: $40 minimum for first 20 miles, then $2 per additional mile. Oversized items may require additional handling.
+                                </p>
                             </div>
 
                             <div id="standardShippingFields">
