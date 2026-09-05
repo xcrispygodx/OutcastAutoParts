@@ -916,18 +916,33 @@ body {
 /* Arrivals Grid */
 .arrivals-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+    .arrivals-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .arrivals-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .arrival-card {
     background: var(--bg-card);
     border: 1px solid var(--border-orange);
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: var(--shadow);
     transition: all 0.3s;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .arrival-card:hover {
@@ -1060,14 +1075,26 @@ body {
 
 /* Large Arrival Cards */
 .arrivals-grid-large {
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+    .arrivals-grid-large {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .arrivals-grid-large {
+        grid-template-columns: 1fr;
+    }
 }
 
 .arrival-card-large {
     background: var(--bg-card);
     border: 1px solid var(--border-orange);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: var(--shadow);
     transition: all 0.3s;
     position: relative;
@@ -1081,16 +1108,16 @@ body {
 
 .arrival-yard-header {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
     align-items: flex-start;
 }
 
 .arrival-yard-img {
-    width: 120px;
-    height: 80px;
+    width: 80px;
+    height: 60px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid var(--border-orange);
     flex-shrink: 0;
 }
@@ -1100,7 +1127,7 @@ body {
 }
 
 .arrival-yard-fee {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--accent);
     font-weight: 600;
     margin-top: 0.25rem;
@@ -1110,7 +1137,7 @@ body {
     font-family: var(--font-display);
     font-weight: 700;
     color: var(--success);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .arrival-profit-bar {
@@ -1120,12 +1147,12 @@ body {
     background: rgba(22, 163, 74, 0.1);
     border: 1px solid rgba(22, 163, 74, 0.3);
     border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin: 1rem 0;
+    padding: 0.5rem 0.75rem;
+    margin: 0.75rem 0;
 }
 
 .arrival-profit-label {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -1134,7 +1161,7 @@ body {
 
 .arrival-profit-value {
     font-family: var(--font-display);
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--success);
     text-shadow: 0 0 8px rgba(22, 163, 74, 0.3);
@@ -1142,7 +1169,7 @@ body {
 
 .arrival-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 

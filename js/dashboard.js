@@ -320,17 +320,22 @@ let liveArrivals = [...sampleArrivals];
 
 function startArrivalRefresh() {
     if (window.arrivalInterval) clearInterval(window.arrivalInterval);
+    window.arrivalRefreshToggle = false;
     window.arrivalInterval = setInterval(() => {
         const yardFilter = document.getElementById('yardFilter')?.value || 'all';
-        simulateLiveArrival();
-        loadNewArrivalsFromLive();
+        window.arrivalRefreshToggle = !window.arrivalRefreshToggle;
+        
+        if (window.arrivalRefreshToggle) {
+            simulateLiveArrival();
+        }
+        
+        loadNewArrivalsFromLive(yardFilter);
     }, ARRIVAL_REFRESH_INTERVAL);
 }
 
 function autoUpdateArrivalsOnLoad() {
-    // Add 3-5 new vehicles automatically on page load
-    const newCount = 3 + Math.floor(Math.random() * 3);
-    for (let i = 0; i < newCount; i++) {
+    const targetCount = Math.max(liveArrivals.length, 9);
+    while (liveArrivals.length < targetCount) {
         const randomYard = yards[Math.floor(Math.random() * yards.length)];
         const vehicles = [
             '2023 Ford F-150 XLT', '2022 Chevy Silverado 1500', '2021 Toyota Camry SE',
@@ -341,19 +346,19 @@ function autoUpdateArrivalsOnLoad() {
         const randomVehicle = vehicles[Math.floor(Math.random() * vehicles.length)];
         
         const newArrival = {
-            id: Date.now() + i,
+            id: Date.now() + Math.random(),
             yardId: randomYard.id,
             yardName: randomYard.name,
             yardUrl: randomYard.url,
             yardImage: `https://placehold.co/400x250/1a0b2e/ffd700?text=${encodeURIComponent(randomYard.name)}`,
             vehicle: randomVehicle,
-            vin: 'AUTO-' + Date.now() + '-' + i,
+            vin: 'AUTO-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
             date: new Date().toISOString().split('T')[0],
             yardFee: '$' + (10 + Math.floor(Math.random() * 10)) + '.00',
             parts: [
                 {
-                    name: 'New Arrival Part #' + (liveArrivals.length + 1 + i),
-                    partNumber: 'NEW-' + Date.now() + '-' + i,
+                    name: 'New Arrival Part #' + (liveArrivals.length + 1),
+                    partNumber: 'NEW-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
                     easyShip: Math.random() > 0.3,
                     ebayPrice: Math.round((30 + Math.random() * 200) * 100) / 100,
                     compatibleModels: ['Multiple Models']
@@ -364,7 +369,6 @@ function autoUpdateArrivalsOnLoad() {
         liveArrivals.unshift(newArrival);
     }
     
-    // Keep only last 30 arrivals
     if (liveArrivals.length > 30) {
         liveArrivals = liveArrivals.slice(0, 30);
     }
@@ -425,8 +429,9 @@ function loadNewArrivalsFromLive(yardFilter = 'all') {
     }
     
     const lastUpdated = new Date().toLocaleTimeString();
+    const displayArrivals = arrivals.slice(0, 9);
     
-    grid.innerHTML = arrivals.map(arrival => {
+    grid.innerHTML = displayArrivals.map(arrival => {
         const totalEbay = arrival.parts.reduce((sum, p) => sum + (p.ebayPrice || 0), 0);
         const yardFee = parseFloat(arrival.yardFee) || 12;
         const potentialProfit = totalEbay - yardFee;
