@@ -1073,6 +1073,39 @@ body {
     border-top: 1px solid var(--border);
 }
 
+.yard-preview-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border-orange);
+    background: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.yard-preview-loading {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.yard-preview-real {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 180px;
+}
+
+.yard-link-card {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
 /* Large Arrival Cards */
 .arrivals-grid-large {
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -163,20 +163,27 @@
             <!-- Yard Quick Links with Images -->
             <div class="yard-quick-links">
                 <a href="https://wrenchapart.com" target="_blank" class="yard-link-card">
-                    <img src="https://placehold.co/300x200/1a0b2e/ffd700?text=Wrench-A-Part" alt="Wrench-A-Part" class="yard-preview-img">
+                    <div class="yard-preview-img yard-preview-loading">Loading...</div>
+                    <img src="" alt="Wrench-A-Part" class="yard-preview-img yard-preview-real" style="display:none;" onerror="this.style.display='none'; this.previousElementSibling.style.display='flex';">
                     <h4>Wrench-A-Part</h4>
                     <p>Self-serve yard • View inventory →</p>
                 </a>
                 <a href="https://rooseveltupullit.com" target="_blank" class="yard-link-card">
-                    <img src="https://placehold.co/300x200/1a0b2e/ffd700?text=Roosevelt+U-Pull-It" alt="Roosevelt U-Pull-It" class="yard-preview-img">
+                    <div class="yard-preview-img yard-preview-loading">Loading...</div>
+                    <img src="" alt="Roosevelt U-Pull-It" class="yard-preview-img yard-preview-real" style="display:none;" onerror="this.style.display='none'; this.previousElementSibling.style.display='flex';">
                     <h4>Roosevelt U-Pull-It</h4>
                     <p>Self-serve yard • View inventory →</p>
                 </a>
                 <a href="https://xcrispygodx.github.io/BIGDONGPARTS/" target="_blank" class="yard-link-card">
-                    <img src="https://placehold.co/300x200/1a0b2e/ffd700?text=AutoAlchemy+Yard" alt="AutoAlchemy Yard" class="yard-preview-img">
+                    <div class="yard-preview-img yard-preview-loading">Loading...</div>
+                    <img src="" alt="AutoAlchemy Yard" class="yard-preview-img yard-preview-real" style="display:none;" onerror="this.style.display='none'; this.previousElementSibling.style.display='flex';">
                     <h4>AutoAlchemy Yard</h4>
                     <p>View vehicle photos & map →</p>
                 </a>
+            </div>
+            
+            <div class="section-actions" style="justify-content: center; margin-top: 1rem;">
+                <button class="btn btn-secondary" onclick="updateYardPreviewImages()">🔄 Refresh Yard Photos</button>
             </div>
 
             <div class="arrivals-grid arrivals-grid-large" id="arrivalsGrid">

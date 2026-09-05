@@ -180,19 +180,35 @@ async function updateYardPreviewImages() {
         const yard = yardUrls[i];
         if (!yard) continue;
 
-        const img = link.querySelector('.yard-preview-img');
+        const loadingEl = link.querySelector('.yard-preview-loading');
+        const img = link.querySelector('.yard-preview-real');
         if (!img) continue;
 
         try {
             const images = await fetchYardImages(yard.url);
             if (images.length > 0) {
                 img.src = images[0];
+                img.style.display = 'block';
+                if (loadingEl) loadingEl.style.display = 'none';
                 img.onerror = function() {
-                    this.src = `https://placehold.co/300x200/1a0b2e/ffd700?text=${encodeURIComponent(yard.name)}`;
+                    this.style.display = 'none';
+                    if (loadingEl) {
+                        loadingEl.textContent = 'Image unavailable';
+                        loadingEl.style.display = 'flex';
+                    }
                 };
+            } else {
+                if (loadingEl) {
+                    loadingEl.textContent = 'No yard photos available';
+                    loadingEl.style.display = 'flex';
+                }
             }
         } catch (error) {
             console.error('Failed to update yard image for', yard.name, error);
+            if (loadingEl) {
+                loadingEl.textContent = 'Failed to load';
+                loadingEl.style.display = 'flex';
+            }
         }
     }
 }
