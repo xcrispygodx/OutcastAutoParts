@@ -309,6 +309,12 @@ async function handleRequest(request) {
     return handleYardImages(request);
   }
   
+  if (path === '/' && request.method === 'GET') {
+    return new Response(JSON.stringify({ service: 'Outcast Auto Parts Auth API', status: 'ok' }), {
+      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    });
+  }
+  
   return errorResponse('Not found', 404);
 }
 
