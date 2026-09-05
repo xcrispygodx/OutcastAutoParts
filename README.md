@@ -110,7 +110,7 @@ Customer and seller accounts are secured with a Cloudflare Worker + KV backend:
 1. Install Wrangler: `npm install -g wrangler`
 2. Create KV namespace: `wrangler kv namespace create AUTH`
 3. Copy the KV namespace ID into `wrangler.toml`
-4. Update the worker URL in `js/auth.js`:
+4. Update the worker URL in `js/auth.js` and `js/dashboard.js`:
     ```javascript
     baseUrl: 'https://outcast-auto-parts-auth.your-subdomain.workers.dev'
     ```
@@ -124,6 +124,20 @@ Customer and seller accounts are secured with a Cloudflare Worker + KV backend:
 - CORS-enabled API
 - Cloudflare rate limiting and DDoS protection
 
+### Yard Image Preview
+
+The dashboard fetches live preview images from linked junkyard sites through a Cloudflare Worker proxy:
+
+- Worker route: `/yard-images?url=<target-url>`
+- Extracts up to 20 images from the target page
+- 1-hour browser cache to avoid repeated fetches
+- Fallback to branded placeholders if no images are found
+
+To enable:
+1. Deploy the auth worker with `wrangler deploy`
+2. Update `YARD_IMAGE_API` in `js/dashboard.js` with your worker URL
+3. Yard preview images will auto-load on dashboard login
+
 ## Future Enhancements
 
 - [x] Stripe checkout integration
@@ -134,6 +148,7 @@ Customer and seller accounts are secured with a Cloudflare Worker + KV backend:
 - [x] Live arrivals with email notifications
 - [x] Local delivery checkout option
 - [x] User authentication & accounts
+- [x] Yard image preview via Cloudflare Worker
 - [ ] Real eBay API integration
 - [ ] Shipping label generation
 - [ ] Freight shipping module

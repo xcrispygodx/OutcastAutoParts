@@ -19,6 +19,9 @@ const EBAY_CONFIG = {
 };
 
 const ARRIVAL_REFRESH_INTERVAL = 30000; // 30 seconds
+const YARD_IMAGE_API = 'https://outcast-auto-parts-auth.your-subdomain.workers.dev/yard-images';
+const YARD_IMAGE_CACHE_TTL = 3600000;
+const yardImageCache = new Map();
 
 // ============================================
 // Authentication
@@ -137,6 +140,60 @@ async function checkAuth() {
         AuthAPI.removeToken();
         document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('dashboardContent').style.display = 'none';
+    }
+}
+
+// ============================================
+// Yard Image Fetcher
+// ============================================
+
+async function fetchYardImages(yardUrl) {
+    const cacheKey = yardUrl;
+    const cached = yardImageCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < YARD_IMAGE_CACHE_TTL) {
+        return cached.images;
+    }
+
+    try {
+        const response = await fetch(`${YARD_IMAGE_API}?url=${encodeURIComponent(yardUrl)}`);
+        if (!response.ok) throw new Error('Failed to fetch yard images');
+        const data = await response.json();
+        const images = data.images || [];
+        yardImageCache.set(cacheKey, { images, timestamp: Date.now() });
+        return images;
+    } catch (error) {
+        console.error('Error fetching yard images:', error);
+        return [];
+    }
+}
+
+async function updateYardPreviewImages() {
+    const yardLinks = document.querySelectorAll('.yard-link-card');
+    const yardUrls = [
+        { url: 'https://wrenchapart.com', name: 'Wrench-A-Part' },
+        { url: 'https://rooseveltupullit.com', name: 'Roosevelt U-Pull-It' },
+        { url: 'https://xcrispygodx.github.io/BIGDONGPARTS/', name: 'AutoAlchemy Yard' }
+    ];
+
+    for (let i = 0; i < yardLinks.length; i++) {
+        const link = yardLinks[i];
+        const yard = yardUrls[i];
+        if (!yard) continue;
+
+        const img = link.querySelector('.yard-preview-img');
+        if (!img) continue;
+
+        try {
+            const images = await fetchYardImages(yard.url);
+            if (images.length > 0) {
+                img.src = images[0];
+                img.onerror = function() {
+                    this.src = `https://placehold.co/300x200/1a0b2e/ffd700?text=${encodeURIComponent(yard.name)}`;
+                };
+            }
+        } catch (error) {
+            console.error('Failed to update yard image for', yard.name, error);
+        }
     }
 }
 
@@ -525,6 +582,7 @@ function initDashboard() {
     subscribeToNotifications();
     updateNotificationUI();
     startArrivalRefresh();
+    updateYardPreviewImages();
 }
 
 // ============================================
